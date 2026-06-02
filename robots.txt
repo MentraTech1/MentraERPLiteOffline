@@ -1,0 +1,18 @@
+# توجيهات لجميع محركات البحث (Google, Bing, etc.)
+User-agent: *
+
+# منع أرشفة صفحات لوحة التحكم والبيانات الحساسة
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /private/
+Disallow: /config/
+
+# السماح بزيارة باقي الموقع والصفحات التعريفية
+Allow: /
+
+# تحديد مسار ملف السايت ماب الصحيح (تأكد من اسم المجلد بدقة)
+Sitemap: https://minafathiaramnious.github.io/MentraERPLiteOfflineFirst/sitemap.xml
+
+# منع محركات البحث المزعجة من استهلاك الموارد
+User-agent: dotbot
+Disallow: /

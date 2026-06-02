@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  
+  <!-- الصفحة الرئيسية - الأولوية القصوى -->
+  <url>
+    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.00</priority>
+  </url>
+
+  <!-- صفحة الدخول -->
+  <url>
+    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/login.html</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- لوحة التحكم -->
+  <url>
+    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/dashboard.html</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- صفحة الاشتراكات -->
+  <url>
+    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/subscriptions.html</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- صفحة الشرح/التعليمات -->
+  <url>
+    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/Tutorial.html</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+</urlset>
