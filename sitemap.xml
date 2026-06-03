@@ -5,7 +5,7 @@
   
   <!-- الصفحة الرئيسية - الأولوية القصوى -->
   <url>
-    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/</loc>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.00</priority>
@@ -13,7 +13,7 @@
 
   <!-- صفحة الدخول -->
   <url>
-    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/login.html</loc>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/login.html</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
@@ -21,7 +21,7 @@
 
   <!-- لوحة التحكم -->
   <url>
-    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/dashboard.html</loc>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/dashboard.html</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
@@ -29,7 +29,7 @@
 
   <!-- صفحة الاشتراكات -->
   <url>
-    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/subscriptions.html</loc>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/subscriptions.html</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.70</priority>
@@ -37,7 +37,7 @@
 
   <!-- صفحة الشرح/التعليمات -->
   <url>
-    <loc>https://minafathiaramnious.github.io/MentraERPLiteOffline/Tutorial.html</loc>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/Tutorial.html</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>

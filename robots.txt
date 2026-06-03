@@ -11,7 +11,7 @@ Disallow: /config/
 Allow: /
 
 # تحديد مسار ملف السايت ماب الصحيح (تأكد من اسم المجلد بدقة)
-Sitemap: https://minafathiaramnious.github.io/MentraERPLiteOfflineFirst/sitemap.xml
+Sitemap: https://mentratech1.github.io/MentraERPLiteOffline/sitemap.xml
 
 # منع محركات البحث المزعجة من استهلاك الموارد
 User-agent: dotbot
