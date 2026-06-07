@@ -7,7 +7,7 @@
         editMode: false,
         activeAccountId: null
     };
-
+// --- ابحث عن دالة renderLayout واستبدلها بهذا الجزء فقط ---
     const renderLayout = () => {
         document.getElementById('main-content-display').innerHTML = `
         <div class="animate-fade-in space-y-6 pb-12" style="direction: rtl;">
@@ -93,6 +93,12 @@
             </div>
         </div>
         `;
+
+        // السطرين دول هما السحر: نقل المودال مباشرة إلى الـ body ليتخلص من قيود الأب والـ transform
+        const modalElement = document.getElementById('acc-modal');
+        if (modalElement) {
+            document.body.appendChild(modalElement);
+        }
     };
 
     // --- محرك الحسابات الذكي (High Performance Engine) ---

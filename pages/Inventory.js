@@ -320,7 +320,14 @@
     window.openProductModal = (id = null) => {
         currentEditingId = id;
         const form = document.getElementById('productForm');
+        const modal = document.getElementById('productModal');
         
+        // --- [الحل السحري لـ Vanilla JS] نقل الـ Modal تلقائياً إلى الـ Body لكسر قيود الـ transform ---
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        // ----------------------------------------------------------------------------------
+
         if(id) {
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen text-blue-500"></i> تعديل الصنف';
             db.products.get(id).then(p => {
@@ -333,11 +340,10 @@
             });
         } else {
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-box text-blue-500"></i> إضافة صنف جديد';
-            form.reset();
+            if(form) form.reset();
         }
         
-        const modal = document.getElementById('productModal');
-        modal.classList.remove('hidden');
+        if(modal) modal.classList.remove('hidden');
     };
 
     window.closeProductModal = () => document.getElementById('productModal').classList.add('hidden');

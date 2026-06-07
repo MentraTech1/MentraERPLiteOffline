@@ -273,10 +273,18 @@
     };
 
     // --- تفاصيل المرتجع وإلغاؤه ---
+// --- تفاصيل المرتجع وإلغاؤه ---
     window.openReturnDetails = async (id) => {
         state.activeInvId = id;
         const inv = await db.invoices.get(id);
         const items = await db.invoice_items.where('invoice_id').equals(id).toArray();
+        const modal = document.getElementById('ret-details-modal');
+        
+        // --- [الحل السحري] نقل الـ Modal تلقائياً إلى الـ Body لكسر قيود الـ transform وجعله يغطي الشاشة بالكامل ---
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        // --------------------------------------------------------------------------------------------------
         
         document.getElementById('ret-modal-no').innerText = inv.invoice_number;
         document.getElementById('ret-modal-date').innerText = String(inv.date).substring(0, 16).replace('T', ' ');
@@ -295,7 +303,7 @@
             </div>
         `).join('');
 
-        document.getElementById('ret-details-modal').classList.remove('hidden');
+        if (modal) modal.classList.remove('hidden');
     };
 
     window.closeRetDetailsModal = () => document.getElementById('ret-details-modal').classList.add('hidden');

@@ -27,7 +27,6 @@
     const reportHTML = `
     <div class="animate-fade-in pb-24 px-2 md:px-0 text-right font-sans" dir="rtl" style="-webkit-tap-highlight-color: transparent;">
         
-        <!-- الهيدر الرئيسي -->
         <div class="flex items-center justify-between gap-3 mb-5 md:mb-8">
             <div class="flex items-center gap-3 md:gap-4">
                 <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-xl md:rounded-[2rem] flex items-center justify-center text-xl md:text-2xl shadow-lg shadow-rose-500/30 shrink-0">
@@ -39,23 +38,18 @@
                 </div>
             </div>
 
-            <!-- أزرار التصدير (تظهر في الديسكتوب والتابلت) -->
             <div class="hidden sm:flex items-center gap-2 shrink-0">
                 <button onclick="exportPurchasesExcel()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white px-4 py-2.5 md:py-3 rounded-xl font-black text-xs transition-all border border-emerald-100"><i class="fas fa-file-excel ml-1"></i> إكسيل</button>
                 <button onclick="exportPurchasesPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white px-4 py-2.5 md:py-3 rounded-xl font-black text-xs transition-all border border-rose-100"><i class="fas fa-file-pdf ml-1"></i> PDF</button>
             </div>
         </div>
 
-        <!-- 📊 الكروت الإحصائية (Grid ذكي للموبايل والديسكتوب) -->
         <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-5 mb-5 md:mb-8">
-            <!-- سيتم ملؤها ديناميكياً -->
-        </div>
+            </div>
 
-        <!-- شريط الأدوات (بحث وفلاتر مدمجة للموبايل) -->
         <div class="bg-white p-3 md:p-6 rounded-[1.2rem] md:rounded-[2rem] shadow-sm border border-slate-100 flex flex-col gap-3 mb-5 md:mb-8">
             
             <div class="flex flex-col md:flex-row gap-3">
-                <!-- البحث الموحد -->
                 <div class="relative w-full md:flex-1">
                     <i class="fas fa-search absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="text" id="p-inv-search" oninput="window.loadPurchases(true)" 
@@ -63,7 +57,6 @@
                            class="w-full bg-slate-50 p-3 md:p-3.5 pr-10 outline-none rounded-xl md:rounded-2xl border border-slate-200 focus:border-rose-500 font-bold text-xs md:text-sm text-slate-800 transition-all">
                 </div>
 
-                <!-- الفلاتر السريعة -->
                 <div class="flex items-center gap-2 bg-slate-50 p-1.5 md:p-2 rounded-xl md:rounded-2xl border border-slate-200 w-full md:w-auto overflow-x-auto hide-scrollbar">
                     <div class="flex items-center gap-1.5 shrink-0 px-2 w-full justify-between md:justify-start">
                         <span class="text-[10px] md:text-xs font-black text-slate-400">من</span>
@@ -75,72 +68,16 @@
                 </div>
             </div>
 
-            <!-- أزرار التصدير (للموبايل فقط في الأسفل) -->
             <div class="flex sm:hidden items-center gap-2 mt-1">
                 <button onclick="exportPurchasesExcel()" class="flex-1 bg-emerald-50 text-emerald-600 px-3 py-2.5 rounded-lg font-black text-[10px] border border-emerald-100 active:bg-emerald-100"><i class="fas fa-file-excel ml-1"></i> إكسيل</button>
                 <button onclick="exportPurchasesPDF()" class="flex-1 bg-rose-50 text-rose-600 px-3 py-2.5 rounded-lg font-black text-[10px] border border-rose-100 active:bg-rose-100"><i class="fas fa-file-pdf ml-1"></i> PDF</button>
             </div>
         </div>
 
-        <!-- قائمة الفواتير (Grid) -->
         <div id="purchases-report-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5"></div>
 
-        <!-- الترقيم (Pagination) مخصص للموبايل والديسكتوب -->
         <div class="flex justify-center items-center mt-6 md:mt-10">
             <div id="pagination-controls" class="bg-white p-1.5 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 flex items-center gap-1"></div>
-        </div>
-    </div>
-
-    <!-- المودال الذكي (Bottom Sheet للموبايل / Modal للديسكتوب) -->
-    <div id="edit-purchase-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-end md:items-center justify-center p-0 md:p-4 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2.5rem] p-4 md:p-8 shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] animate-bottom-sheet md:animate-pop-in relative text-right pb-safe" dir="rtl">
-            
-            <!-- مؤشر السحب (للموبايل فقط) -->
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-3 md:hidden"></div>
-
-            <!-- هيدر المودال -->
-            <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3 md:pb-4 shrink-0">
-                <div>
-                    <h3 class="text-base md:text-xl font-black text-slate-900 flex items-center gap-2">
-                        فاتورة <span id="modal-inv-no" class="text-rose-600 font-mono bg-rose-50 px-2 py-0.5 rounded-md"></span>
-                    </h3>
-                </div>
-                <button onclick="closeEditModal()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center active:scale-90"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <!-- المنطقة القابلة للتمرير -->
-            <div class="flex-1 overflow-y-auto hide-scrollbar space-y-4">
-                
-                <!-- قائمة الأصناف -->
-                <div class="bg-slate-50 rounded-2xl p-2 border border-slate-100">
-                    <div id="modal-items-body" class="space-y-2"></div>
-                </div>
-
-                <!-- الإعدادات والإجمالي -->
-                <div class="grid grid-cols-2 gap-2 md:gap-4">
-                    <div class="bg-white border border-slate-200 p-2 md:p-4 rounded-xl flex flex-col justify-center">
-                        <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">حالة السداد</span>
-                        <select id="modal-inv-status" class="bg-transparent font-bold text-xs md:text-sm text-slate-800 outline-none w-full">
-                            <option value="paid">✅ مدفوعة بالكامل</option>
-                            <option value="pending">⏳ آجل (دين مستحق)</option>
-                        </select>
-                    </div>
-                    <div class="bg-slate-900 p-3 md:p-4 rounded-xl flex flex-col justify-center items-end shadow-md">
-                        <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-0.5">الإجمالي النهائي</span>
-                        <h2 id="modal-inv-total" class="text-lg md:text-2xl font-black text-emerald-400 font-mono truncate w-full text-left">0.00</h2>
-                    </div>
-                </div>
-            </div>
-
-            <!-- الأزرار السفلية (Sticky Footer) -->
-            <div class="pt-3 md:pt-4 mt-2 border-t border-slate-100 flex gap-2 shrink-0">
-                <button onclick="saveSmartPurchaseEdit()" class="flex-[2] bg-emerald-500 text-white py-3.5 rounded-xl font-black shadow-lg shadow-emerald-500/20 active:bg-emerald-600 active:scale-95 transition-all text-xs md:text-sm flex justify-center items-center gap-1.5">
-                    <i class="fas fa-check-circle"></i> حفظ المخزن
-                </button>
-                <button onclick="confirmDeletePurchase()" class="flex-1 bg-rose-50 text-rose-600 py-3.5 rounded-xl font-black border border-rose-100 active:bg-rose-100 active:scale-95 transition-all text-xs md:text-sm flex justify-center items-center gap-1.5">
-                    <i class="fas fa-trash-alt"></i> حذف
-                </button>
-            </div>
         </div>
     </div>
     `;
@@ -289,7 +226,7 @@
     };
 
 
-    // --- نظام التعديل الذكي المخصص للموبايل ---
+    // --- نظام الـ Portal للنافذة المنبثقة (الحل الجذري لمشكلة الـ Transform والـ Clipping) ---
     window.openPurchaseDetails = async (id) => {
         state.activeInvId = id;
         const inv = await db.invoices.get(id);
@@ -297,23 +234,74 @@
         
         state.editingItems = JSON.parse(JSON.stringify(items));
 
-        document.getElementById('modal-inv-no').innerText = `${inv.invoice_number}`;
-        document.getElementById('modal-inv-total').innerText = parseFloat(inv.total).toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('modal-inv-status').value = inv.status;
+        // حذف أي نسخة قديمة من المودال في البودي لمنع تكرار الـ IDs
+        const oldModal = document.getElementById('edit-purchase-modal');
+        if (oldModal) oldModal.remove();
 
+        // إنشاء وعرض المودال مباشرة داخل الـ document.body لتخطي حدود الـ animate-view
+        const modalContainer = document.createElement('div');
+        modalContainer.id = 'edit-purchase-modal';
+        modalContainer.className = 'fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-end md:items-center justify-center p-0 md:p-4 transition-opacity duration-300';
+        
+        modalContainer.innerHTML = `
+            <div class="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2.5rem] p-4 md:p-8 shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] animate-bottom-sheet md:animate-pop-in relative text-right pb-safe" dir="rtl">
+                
+                <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-3 md:hidden"></div>
+
+                <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3 md:pb-4 shrink-0">
+                    <div>
+                        <h3 class="text-base md:text-xl font-black text-slate-900 flex items-center gap-2">
+                            فاتورة <span id="modal-inv-no" class="text-rose-600 font-mono bg-rose-50 px-2 py-0.5 rounded-md">${inv.invoice_number}</span>
+                        </h3>
+                    </div>
+                    <button onclick="closeEditModal()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center active:scale-90"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto hide-scrollbar space-y-4">
+                    
+                    <div class="bg-slate-50 rounded-2xl p-2 border border-slate-100">
+                        <div id="modal-items-body" class="space-y-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 md:gap-4">
+                        <div class="bg-white border border-slate-200 p-2 md:p-4 rounded-xl flex flex-col justify-center">
+                            <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">حالة السداد</span>
+                            <select id="modal-inv-status" class="bg-transparent font-bold text-xs md:text-sm text-slate-800 outline-none w-full">
+                                <option value="paid" ${inv.status === 'paid' ? 'selected' : ''}>✅ مدفوعة بالكامل</option>
+                                <option value="pending" ${inv.status === 'pending' ? 'selected' : ''}>⏳ آجل (دين مستحق)</option>
+                            </select>
+                        </div>
+                        <div class="bg-slate-900 p-3 md:p-4 rounded-xl flex flex-col justify-center items-end shadow-md">
+                            <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-0.5">الإجمالي النهائي</span>
+                            <h2 id="modal-inv-total" class="text-lg md:text-2xl font-black text-emerald-400 font-mono truncate w-full text-left">${parseFloat(inv.total).toLocaleString('en-US', {minimumFractionDigits: 2})}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 md:pt-4 mt-2 border-t border-slate-100 flex gap-2 shrink-0">
+                    <button onclick="saveSmartPurchaseEdit()" class="flex-[2] bg-emerald-500 text-white py-3.5 rounded-xl font-black shadow-lg shadow-emerald-500/20 active:bg-emerald-600 active:scale-95 transition-all text-xs md:text-sm flex justify-center items-center gap-1.5">
+                        <i class="fas fa-check-circle"></i> حفظ المخزن
+                    </button>
+                    <button onclick="confirmDeletePurchase()" class="flex-1 bg-rose-50 text-rose-600 py-3.5 rounded-xl font-black border border-rose-100 active:bg-rose-100 active:scale-95 transition-all text-xs md:text-sm flex justify-center items-center gap-1.5">
+                        <i class="fas fa-trash-alt"></i> حذف
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modalContainer);
         renderModalItems();
-        const modal = document.getElementById('edit-purchase-modal');
-        modal.classList.remove('hidden');
     };
 
     function renderModalItems() {
-        document.getElementById('modal-items-body').innerHTML = state.editingItems.map((item, idx) => `
+        const body = document.getElementById('modal-items-body');
+        if (!body) return;
+        body.innerHTML = state.editingItems.map((item, idx) => `
             <div class="bg-white border border-slate-200 p-2.5 md:p-3 rounded-xl flex justify-between items-center shadow-sm">
                 <div class="flex-1 min-w-0 pr-2">
                     <p class="font-black text-[11px] md:text-xs text-slate-800 truncate">${item.product_name || 'صنف مجهول'}</p>
                     <p class="text-[9px] md:text-[10px] font-bold text-slate-500 mt-0.5">${Number(item.price).toLocaleString()} ج.م</p>
                 </div>
-                <!-- أزرار زيادة ونقصان (Touch Friendly) -->
                 <div class="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200 shrink-0">
                     <button onclick="adjustQty(${idx}, -1)" class="w-7 h-7 bg-white rounded border border-slate-200 text-slate-500 flex items-center justify-center active:bg-slate-100"><i class="fas fa-minus text-[8px]"></i></button>
                     <span class="w-8 text-center font-black text-xs text-blue-600 font-mono">${item.qty}</span>
@@ -407,7 +395,10 @@
         } catch (e) { Swal.fire({icon: 'error', title: 'خطأ', text: e.message}); }
     };
 
-    window.closeEditModal = () => document.getElementById('edit-purchase-modal').classList.add('hidden');
+    window.closeEditModal = () => {
+        const modal = document.getElementById('edit-purchase-modal');
+        if (modal) modal.remove();
+    };
 
     // --- التصدير (PDF & Excel) ---
     window.exportPurchasesExcel = () => {

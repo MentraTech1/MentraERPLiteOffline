@@ -15,7 +15,7 @@
     let activeInvoiceId = null;
     let editingItems = [];
 
-    // إضافة ستايل خاص للموبايل (Safe Area & Hide Scrollbar)
+    // إضافة ستايل خاص للموبايل (Safe Area & Hide Scrollbar & Fix Fixed Position)
     const style = document.createElement('style');
     style.innerHTML = `
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -30,7 +30,6 @@
     displayArea.innerHTML = `
     <div class="animate-fade-in pb-24 px-2 md:px-0 text-right font-sans" dir="rtl" style="-webkit-tap-highlight-color: transparent;">
         
-        <!-- الهيدر الرئيسي -->
         <div class="flex items-center justify-between gap-3 mb-5 md:mb-8">
             <div class="flex items-center gap-3 md:gap-4">
                 <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-xl md:rounded-[2rem] flex items-center justify-center text-xl md:text-2xl shadow-lg shadow-blue-500/30 shrink-0">
@@ -42,21 +41,17 @@
                 </div>
             </div>
             
-            <!-- أزرار التصدير (تظهر في الديسكتوب فقط هنا) -->
             <div class="hidden md:flex items-center gap-2 shrink-0">
                 <button onclick="exportToExcel()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white px-4 py-3 rounded-xl font-black text-xs transition-all border border-emerald-100"><i class="fas fa-file-excel ml-1"></i> إكسيل</button>
                 <button onclick="exportToPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white px-4 py-3 rounded-xl font-black text-xs transition-all border border-rose-100"><i class="fas fa-file-pdf ml-1"></i> PDF</button>
             </div>
         </div>
 
-        <!-- الكروت الإحصائية -->
         <div id="salesStats" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-5 mb-5 md:mb-8"></div>
 
-        <!-- شريط الأدوات (بحث وفلاتر مدمجة للموبايل) -->
         <div class="bg-white p-3 md:p-6 rounded-[1.2rem] md:rounded-[2rem] shadow-sm border border-slate-100 flex flex-col gap-3 mb-5 md:mb-8">
             
             <div class="flex flex-col md:flex-row gap-3">
-                <!-- البحث الموحد -->
                 <div class="relative w-full md:flex-1">
                     <i class="fas fa-search absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="text" id="searchInvoice" oninput="handleSearch(this.value)" 
@@ -64,7 +59,6 @@
                            class="w-full bg-slate-50 p-3 md:p-3.5 pr-10 outline-none rounded-xl md:rounded-2xl border border-slate-200 focus:border-blue-500 font-bold text-xs md:text-sm text-slate-800 transition-all">
                 </div>
 
-                <!-- الفلاتر السريعة -->
                 <div class="flex items-center gap-2 bg-slate-50 p-1.5 md:p-2 rounded-xl md:rounded-2xl border border-slate-200 w-full md:w-auto overflow-x-auto hide-scrollbar">
                     <button onclick="setQuickSaleDate('today')" class="flex-1 md:flex-none bg-white border border-slate-200 px-4 py-2 rounded-lg text-[10px] md:text-[11px] font-black text-slate-700 hover:text-blue-600 shadow-sm whitespace-nowrap active:scale-95">اليوم</button>
                     <button onclick="setQuickSaleDate('month')" class="flex-1 md:flex-none bg-white border border-slate-200 px-4 py-2 rounded-lg text-[10px] md:text-[11px] font-black text-slate-700 hover:text-blue-600 shadow-sm whitespace-nowrap active:scale-95">الشهر</button>
@@ -77,17 +71,14 @@
                 </div>
             </div>
 
-            <!-- أزرار التصدير (للموبايل فقط في الأسفل) -->
             <div class="flex md:hidden items-center gap-2 mt-1">
                 <button onclick="exportToExcel()" class="flex-1 bg-emerald-50 text-emerald-600 px-3 py-2.5 rounded-lg font-black text-[10px] border border-emerald-100 active:bg-emerald-100"><i class="fas fa-file-excel ml-1"></i> إكسيل</button>
                 <button onclick="exportToPDF()" class="flex-1 bg-rose-50 text-rose-600 px-3 py-2.5 rounded-lg font-black text-[10px] border border-rose-100 active:bg-rose-100"><i class="fas fa-file-pdf ml-1"></i> PDF</button>
             </div>
         </div>
 
-        <!-- قائمة الفواتير (Cards) -->
         <div id="sales-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5"></div>
 
-        <!-- الترقيم (Pagination) مخصص للموبايل -->
         <div class="flex justify-center items-center mt-6 md:mt-10">
             <div class="bg-white p-1.5 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 flex items-center gap-1">
                 <button onclick="changePage(-1)" id="prevBtn" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-slate-50 rounded-lg md:rounded-xl text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all active:scale-90"><i class="fas fa-chevron-right text-sm"></i></button>
@@ -99,14 +90,11 @@
         </div>
     </div>
 
-    <!-- المودال الذكي (Bottom Sheet للموبايل / Modal للديسكتوب) تم تحسين التصميم وإضافة زر الطباعة -->
     <div id="detailsModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center p-0 md:p-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2.5rem] p-4 md:p-6 shadow-2xl flex flex-col max-h-[92vh] md:max-h-[85vh] animate-bottom-sheet md:animate-pop-in relative text-right pb-safe" dir="rtl">
             
-            <!-- مؤشر السحب (للموبايل فقط) -->
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-3 md:hidden"></div>
 
-            <!-- هيدر المودال -->
             <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3 md:pb-4 shrink-0">
                 <div>
                     <h3 class="text-base md:text-xl font-black text-slate-900 flex items-center gap-2">
@@ -115,7 +103,6 @@
                     </h3>
                     <p id="view-inv-date" class="text-[9px] md:text-xs font-bold text-slate-400 mt-1"></p>
                 </div>
-                <!-- أزرار الإغلاق والطباعة -->
                 <div class="flex items-center gap-2">
                     <button onclick="printSingleInvoice()" class="w-9 h-9 md:w-10 md:h-10 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 flex items-center justify-center active:scale-90 transition-all shadow-sm" title="طباعة الفاتورة">
                         <i class="fas fa-print text-sm md:text-base"></i>
@@ -126,22 +113,18 @@
                 </div>
             </div>
             
-            <!-- المنطقة القابلة للتمرير -->
             <div class="flex-1 overflow-y-auto hide-scrollbar space-y-4 pr-1">
                 
-                <!-- أرباح الفاتورة -->
                 <div id="invoice-profit-badge" class="bg-emerald-50 border border-emerald-100 p-3 md:p-4 rounded-xl flex items-center justify-between">
                     <span class="text-[10px] md:text-xs font-black text-emerald-600 uppercase"><i class="fas fa-chart-line ml-1"></i> صافي ربح الفاتورة</span>
                     <span id="view-inv-profit" class="font-black text-sm md:text-base text-emerald-700 font-mono">0.00 ج.م</span>
                 </div>
 
-                <!-- قائمة الأصناف (تصميم محسن) -->
                 <div>
                     <h4 class="text-[10px] font-black text-slate-400 mb-2 uppercase px-1">الأصناف المسجلة</h4>
                     <div id="invoice-items-list" class="space-y-2"></div>
                 </div>
 
-                <!-- الإعدادات والإجمالي -->
                 <div class="grid grid-cols-2 gap-3 md:gap-4 mt-2">
                     <div class="bg-white border border-slate-200 p-3 md:p-4 rounded-2xl flex flex-col justify-center shadow-sm">
                         <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1.5"><i class="fas fa-wallet"></i> حالة السداد</span>
@@ -158,7 +141,6 @@
                 </div>
             </div>
 
-            <!-- الأزرار السفلية (Sticky Footer) -->
             <div class="pt-3 md:pt-4 mt-3 border-t border-slate-100 flex gap-2 shrink-0">
                 <button onclick="saveSmartEdit()" class="flex-[2] bg-blue-600 text-white py-3.5 md:py-4 rounded-2xl font-black shadow-lg shadow-blue-500/30 active:bg-blue-700 active:scale-95 transition-all text-xs md:text-sm flex justify-center items-center gap-2">
                     <i class="fas fa-save"></i> حفظ التعديلات
@@ -170,6 +152,12 @@
         </div>
     </div>
     `;
+
+    // الحل الفوري (Manual Portal): نقل عنصر المودال مباشرة إلى الـ body ليتخلص من أي تداخل مع الترانسفورم والأب
+    const modalElement = document.getElementById('detailsModal');
+    if (modalElement) {
+        document.body.appendChild(modalElement);
+    }
 
     // --- 2. وظائف جلب وعرض البيانات ---
 
@@ -245,7 +233,6 @@
             <div class="bg-white p-3.5 md:p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all cursor-pointer relative overflow-hidden flex flex-col" onclick="openDetails(${inv.id})">
                 <div class="absolute top-0 right-0 w-1 h-full bg-${statusColor}-500"></div>
                 
-                <!-- Header -->
                 <div class="flex justify-between items-start mb-2 border-b border-slate-50 pb-2">
                     <div>
                         <span class="block text-xs font-black text-slate-800 font-mono tracking-tighter">#${inv.invoice_number}</span>
@@ -256,7 +243,6 @@
                     </span>
                 </div>
                 
-                <!-- Customer -->
                 <div class="mb-3 flex items-center gap-2">
                     <div class="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0"><i class="fas fa-user text-[9px]"></i></div>
                     <div class="min-w-0 flex-1">
@@ -264,7 +250,6 @@
                     </div>
                 </div>
                 
-                <!-- Footer -->
                 <div class="flex justify-between items-end mt-auto pt-1">
                     <div>
                         <p class="text-[8px] font-black text-slate-400 uppercase mb-0.5">الإجمالي</p>
@@ -323,7 +308,6 @@
         modal.classList.remove('hidden');
     };
 
-    // تم تحسين تصميم الأصناف بداخل نافذة الفاتورة لسهولة الاستخدام
     window.renderModalItems = () => {
         document.getElementById('invoice-items-list').innerHTML = editingItems.map((item, idx) => `
             <div class="bg-white border border-slate-100 p-3 rounded-2xl flex justify-between items-center shadow-sm hover:border-blue-100 transition-all">
@@ -332,7 +316,6 @@
                     <p class="text-[10px] font-bold text-slate-500 mt-1"><i class="fas fa-tag text-slate-300"></i> ${Number(item.price).toLocaleString()} ج.م / الوحدة</p>
                 </div>
                 
-                <!-- صندوق تعديل الكمية المطور -->
                 <div class="flex flex-col items-center gap-1.5 shrink-0 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
                     <span class="text-[8px] font-black text-slate-400 uppercase leading-none">الكمية</span>
                     <div class="flex items-center gap-2">
@@ -440,14 +423,12 @@
 
     // --- 4. التصدير والطباعة (Excel, PDF, Single Invoice Print) ---
 
-    // دالة طباعة بون الفاتورة الفردية (Thermal Receipt Style)
     window.printSingleInvoice = async () => {
         if (!activeInvoiceId) return;
 
         try {
             const inv = await db.invoices.get(activeInvoiceId);
             
-            // محاولة جلب بيانات المتجر للإيصال
             let shopName = "Mentra ERP";
             let shopPhone = "";
             if(db.settings) {
@@ -461,7 +442,6 @@
             const items = editingItems;
             const finalTotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
             
-            // فتح نافذة الطباعة
             let printWin = window.open('', '_blank');
             let html = `
                 <!DOCTYPE html>
@@ -480,7 +460,7 @@
                             font-size: 12px;
                         }
                         .receipt-container { 
-                            max-width: 80mm; /* عرض البون الحراري */
+                            max-width: 80mm; 
                             margin: 0 auto; 
                         }
                         .header { 
