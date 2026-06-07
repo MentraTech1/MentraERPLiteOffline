@@ -13,6 +13,7 @@
         accounts: []
     };
 
+// --- ابحث عن دالة renderLayout واستبدلها بهذا الجزء فقط ---
     const renderLayout = () => {
         const displayArea = document.getElementById('main-content-display');
         if (!displayArea) return;
@@ -34,7 +35,6 @@
                 </div>
             </div>
 
-            <!-- شريط الفلترة والأدوات -->
             <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-wrap justify-between items-center gap-4">
                 <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100 w-full lg:w-auto">
                     <span class="text-[10px] font-black text-slate-400 mr-2">من</span>
@@ -50,7 +50,6 @@
                 </button>
             </div>
 
-            <!-- جدول عرض القيود -->
             <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 overflow-hidden overflow-x-auto">
                 <table class="w-full text-right min-w-[600px]">
                     <thead>
@@ -68,7 +67,6 @@
             </div>
         </div>
 
-        <!-- نافذة إضافة القيد -->
         <div id="j-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] items-center justify-center p-4">
             <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] animate-pop-in">
                 <div class="p-6 border-b border-slate-50 flex justify-between items-center shrink-0">
@@ -94,6 +92,12 @@
             </div>
         </div>
         `;
+
+        // نقل المودال مباشرة إلى الـ body ليتخلص من قيود الأب والـ transform
+        const modalElement = document.getElementById('j-modal');
+        if (modalElement) {
+            document.body.appendChild(modalElement);
+        }
     };
 
     // --- المنطق البرمجي (Logic) ---
