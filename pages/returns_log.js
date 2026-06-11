@@ -4,6 +4,14 @@
  */
 
 (function() {
+    // -----------------------------------------------------------------------
+    // [حل المشكلة]: تنظيف الـ Modal وأي عناصر متبقية في الـ Body من الزيارات السابقة
+    const oldModal = document.getElementById('ret-details-modal');
+    if (oldModal) {
+        oldModal.remove(); 
+    }
+    // -----------------------------------------------------------------------
+
     const displayArea = document.getElementById('main-content-display');
     const state = { 
         activeInvId: null, 
@@ -13,16 +21,19 @@
         totalReturnedQty: 0
     };
 
-    // ستايلات الموبايل والـ Bottom Sheet
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
-        @keyframes slide-up-sheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .animate-bottom-sheet { animation: slide-up-sheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    `;
-    document.head.appendChild(style);
+    // ستايلات الموبايل والـ Bottom Sheet (مع منع تكرار الإضافة)
+    if (!document.getElementById('returns-custom-styles')) {
+        const style = document.createElement('style');
+        style.id = 'returns-custom-styles';
+        style.innerHTML = `
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+            @keyframes slide-up-sheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+            .animate-bottom-sheet { animation: slide-up-sheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        `;
+        document.head.appendChild(style);
+    }
 
     const logHTML = `
     <div class="animate-fade-in pb-24 px-2 md:px-0 text-right font-sans" dir="rtl" style="-webkit-tap-highlight-color: transparent;">
@@ -273,7 +284,6 @@
     };
 
     // --- تفاصيل المرتجع وإلغاؤه ---
-// --- تفاصيل المرتجع وإلغاؤه ---
     window.openReturnDetails = async (id) => {
         state.activeInvId = id;
         const inv = await db.invoices.get(id);

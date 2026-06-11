@@ -1,5 +1,5 @@
 // تحديد اسم ورقم إصدار الـ Cache (يجب تغييره عند تحديث أي ملف في المشروع)
-const CACHE_NAME = 'mentra-erp-lite-v1';
+const CACHE_NAME = 'mentra-erp-lite-v4';
 
 // قائمة بالملفات الأساسية التي يجب تحميلها وتخزينها عند تثبيت التطبيق
 const ASSETS_TO_CACHE = [

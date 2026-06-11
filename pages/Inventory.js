@@ -1,9 +1,17 @@
 (function() {
+    // -----------------------------------------------------------------------
+    // [حل المشكلة]: تنظيف الـ Modal وأي عناصر متبقية في الـ Body من الزيارات السابقة
+    const oldModal = document.getElementById('productModal');
+    if (oldModal) {
+        oldModal.remove(); 
+    }
+    // -----------------------------------------------------------------------
+
     const displayArea = document.getElementById('main-content-display');
     
     // متغيرات الـ Pagination والفلترة
     let currentPage = 1;
-    const itemsPerPage = 3; // تم التثبيت على 5 عناصر في الصفحة
+    const itemsPerPage = 3; // تم التثبيت على 3 عناصر في الصفحة كما بالكود الخاص بك
     let currentFilter = 'all'; // (all, low, out)
     let currentEditingId = null;
 
@@ -48,14 +56,14 @@
                    class="w-full bg-slate-50 py-3 md:py-4 pr-12 pl-4 rounded-2xl outline-none font-bold text-sm md:text-base border-2 border-transparent focus:border-blue-500 transition-all text-[16px]">
         </div>
 
-        <!-- قائمة المنتجات (أكثر اندماجاً وصغراً) -->
+        <!-- قائمة المنتجات -->
         <div id="productsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"></div>
 
         <!-- حاوية الـ Pagination -->
         <div id="paginationContainer" class="flex items-center justify-center gap-2 mt-6 pb-4"></div>
     </div>
 
-    <!-- نافذة إضافة/تعديل صنف (محدثة واحترافية لجميع الشاشات) -->
+    <!-- نافذة إضافة/تعديل صنف -->
     <div id="productModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center p-0 md:p-4 transition-opacity">
         <div class="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] animate-slide-up md:animate-zoom-in relative">
             
@@ -128,17 +136,21 @@
         </div>
     </div>`;
 
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @media (min-width: 768px) { .md\\:animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); } }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-    `;
-    document.head.appendChild(style);
+    // [تعديل إضافي بسيط]: لمنع تكرار إضافة الـ style كل مرة تدخل فيها للصفحة
+    if (!document.getElementById('inventory-custom-styles')) {
+        const style = document.createElement('style');
+        style.id = 'inventory-custom-styles';
+        style.innerHTML = `
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+            @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+            .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+            @media (min-width: 768px) { .md\\:animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); } }
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        `;
+        document.head.appendChild(style);
+    }
 
     // 2. تحديث الإحصائيات
     const updateStats = async () => {
@@ -167,7 +179,7 @@
         `;
     };
 
-    // 3. عرض المنتجات (مصغرة Compact Design)
+    // 3. عرض المنتجات
     window.renderProducts = async () => {
         const query = document.getElementById('productSearch').value.toLowerCase();
         const container = document.getElementById('productsList');
@@ -206,7 +218,6 @@
             return;
         }
 
-        // تصميم الكروت المصغر
         container.innerHTML = visibleProducts.map(p => `
             <div class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border ${p.stock_qty <= 0 ? 'border-rose-100 bg-rose-50/30' : 'border-slate-100'} relative transition-all hover:shadow-md">
                 <div class="flex justify-between items-start mb-2">
@@ -237,7 +248,6 @@
                     </div>
                 </div>
 
-                <!-- زر الإضافة السريعة (مصغر) -->
                 <button onclick="quickAdd(${p.id}, '${p.name_ar}')" class="absolute -bottom-2 -right-2 bg-slate-800 text-white w-9 h-9 md:w-10 md:h-10 rounded-xl shadow-lg shadow-slate-300 flex items-center justify-center hover:bg-blue-600 hover:scale-105 active:scale-90 transition-all border-2 border-white">
                     <i class="fas fa-plus text-[10px]"></i>
                 </button>
@@ -248,7 +258,7 @@
         updateStats();
     };
 
-    // 4. دالة رسم أزرار الترقيم (Pagination UI)
+    // 4. دالة رسم أزرار الترقيم
     const renderPagination = (totalPages) => {
         const paginationContainer = document.getElementById('paginationContainer');
         
