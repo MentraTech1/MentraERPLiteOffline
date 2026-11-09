@@ -1,45 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  
-  <!-- الصفحة الرئيسية - الأولوية القصوى -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- 1. الصفحة الرئيسية (Landing Page) -->
   <url>
     <loc>https://mentratech1.github.io/MentraERPLiteOffline/</loc>
-    <lastmod>2026-05-12</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>1.00</priority>
+    <priority>1.0</priority>
+    
+    <!-- صور الصفحة الرئيسية لتعزيز الظهور في Google Images -->
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/smalicon-512.png</image:loc>
+      <image:title>شعار برنامج الكاشير والمبيعات Mentra ERP Lite</image:title>
+      <image:caption>برنامج مجاني لإدارة المبيعات والمخازن ونقاط البيع بدون إنترنت</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot.png</image:loc>
+      <image:title>واجهة برنامج كاشير ومبيعات للكمبيوتر</image:title>
+      <image:caption>لوحة تحكم تفاعلية لإدارة الإيرادات والمصروفات</image:caption>
+    </image:image>
   </url>
 
-  <!-- صفحة الدخول -->
-  <url>
-    <loc>https://mentratech1.github.io/MentraERPLiteOffline/login.html</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <!-- لوحة التحكم -->
-  <url>
-    <loc>https://mentratech1.github.io/MentraERPLiteOffline/dashboard.html</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <!-- صفحة الاشتراكات -->
-  <url>
-    <loc>https://mentratech1.github.io/MentraERPLiteOffline/subscriptions.html</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
-  </url>
-
-  <!-- صفحة الشرح/التعليمات -->
+  <!-- 2. صفحة دليل الاستخدام والشرح المصور (Tutorial) -->
   <url>
     <loc>https://mentratech1.github.io/MentraERPLiteOffline/Tutorial.html</loc>
-    <lastmod>2026-05-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+
+    <!-- أرشفة صور الشرح والخطوات باللغة العربية للظهور في بحث الصور -->
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot.png</image:loc>
+      <image:title>الرادار المالي واللوحة الرئيسية</image:title>
+      <image:caption>معرفة صافي الربح التقديري ومراقبة المبيعات والمشتريات لحظياً</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot%20(46).png</image:loc>
+      <image:title>شاشة كاشير المبيعات ونقطة البيع POS</image:title>
+      <image:caption>نقطة بيع تدعم قارئ الباركود والبيع النقدي والآجل للمحلات</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot%20(47).png</image:loc>
+      <image:title>إدارة المخازن والجرد وتنبيهات النواقص</image:title>
+      <image:caption>إضافة أصناف جديدة واستخراج قائمة جرد بصيغة PDF أو إكسيل</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot%20(48).png</image:loc>
+      <image:title>المحاسبة والقيود اليومية</image:title>
+      <image:caption>دليل حسابات مبسط لمراقبة الأصول والخصوم وصافي حقوق الملكية</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mentratech1.github.io/MentraERPLiteOffline/assets/img/Screenshot%20(49).png</image:loc>
+      <image:title>النسخ الاحتياطي والأمان</image:title>
+      <image:caption>تصدير واستيراد قواعد البيانات بنقرة واحدة لتأمين معلومات المتجر</image:caption>
+    </image:image>
   </url>
+
+  <!-- 3. بوابة إعداد النشاط التجاري (Subscriptions) -->
+  <url>
+    <loc>https://mentratech1.github.io/MentraERPLiteOffline/subscriptions.html</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
 </urlset>

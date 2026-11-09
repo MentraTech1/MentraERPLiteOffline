@@ -14,146 +14,218 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="assets/dexie.min.js"></script>
     <script src="assets/js/db-init.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
         body { 
             font-family: 'Tajawal', sans-serif; 
-            background: #f8fafc;
-            overscroll-behavior-y: contain;
             -webkit-tap-highlight-color: transparent;
+            /* خلفية حديثة متدرجة */
+            background-color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
         }
         .login-card { 
-            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.15);
         }
+        .modal-enter { animation: fadeInScale 0.3s ease-out forwards; }
+        
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        /* إخفاء شريط التمرير لقائمة الحسابات */
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+/* تخصيص عرض وطول شريط التمرير (أرفع وأكثر أناقة) */
+::-webkit-scrollbar {
+  width: 7px;  
+  height: 7px; 
+}
+
+/* خلفية أو مسار شريط التمرير بتصميم ناعم */
+::-webkit-scrollbar-track {
+  background: #f8fafc; /* لون خلفية هادئ جداً */
+  border-radius: 10px;
+}
+
+/* الجزء المتحرك بتدرج لوني احترافي (متناسق مع الأزرق والإنديجو) */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* تغيير التدرج عند مرور الماوس عليه ليصبح أداكن وأكثر تفاعلاً */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+}
+
+/* دعم متصفح فايرفوكس (مع تصحيح الرمز ليعمل بكفاءة) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 #f8fafc;
+}
+        
+        /* شريط تمرير مخصص للقائمة العمودية */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .input-group:focus-within i { color: #2563eb; transform: scale(1.1); transition: all 0.3s; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-[100dvh] p-4 bg-slate-50 relative">
+<!-- تم إزالة overflow-hidden وإضافة مسافات علوية وسفلية py-12 للسماح بالتمرير المريح -->
+<body class="flex flex-col items-center justify-center min-h-[100dvh] py-12 px-4 relative">
+
+    <!-- خلفية ديكور (تم تحويلها لـ fixed لكي لا تخفي المحتوى عند التمرير) -->
+    <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
     <!-- زر العودة للرئيسية -->
-    <a href="index.html" class="absolute top-6 left-6 text-slate-500 hover:text-blue-600 bg-white/80 backdrop-blur-md border border-slate-200 px-4 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-sm transition-all flex items-center gap-2 hover:scale-105 active:scale-95 z-10">
+    <a href="index.html" class="absolute top-6 left-6 text-slate-500 hover:text-blue-600 bg-white border border-slate-200 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm shadow-sm transition-all flex items-center gap-2 hover:scale-105 active:scale-95 z-10">
         <i class="fas fa-home"></i> الرئيسية
     </a>
 
-    <div class="login-card w-full max-w-md bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-slate-100 relative">
+    <div class="login-card w-full max-w-md rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-slate-100 relative z-20 my-auto">
         
         <!-- الهيدر واللوجو -->
-        <div class="text-center mb-8 mt-2">
-            <div class="bg-blue-600 w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
-                <img src="assets/img/smalicon.png" alt="Logo" class="w-8 h-8 object-contain brightness-0 invert">
-            </div>
+        <div class="text-center mb-6 mt-2">
+<div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-xl shadow-blue-500/30 transform rotate-3 hover:rotate-0 transition-transform cursor-pointer">
+    <!-- أيقونة الرسم البياني (Bar Chart) -->
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+    </svg>
+</div>
             <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Mentra ERP Lite</h1>
-            <p class="text-slate-400 text-[11px] md:text-xs mt-2 font-black uppercase tracking-widest">تسجيل الدخول للنظام المحلي</p>
+            <p class="text-blue-500 text-[11px] md:text-xs mt-2 font-black uppercase tracking-widest bg-blue-50 inline-block px-3 py-1 rounded-full border border-blue-100">نظام إدارة محلي</p>
         </div>
 
-        <!-- رسالة الخطأ (مخفية افتراضياً) -->
-        <div id="error-message" class="hidden bg-rose-50 text-rose-600 p-4 rounded-2xl mb-6 text-sm font-black flex items-center gap-3 border border-rose-100 transition-all">
-            <i class="fas fa-exclamation-circle text-lg"></i>
+        <!-- رسالة الخطأ -->
+        <div id="error-message" class="hidden bg-rose-50 text-rose-600 p-4 rounded-2xl mb-6 text-sm font-black flex items-center gap-3 border border-rose-100 transition-all shadow-sm">
+            <i class="fas fa-exclamation-circle text-lg animate-bounce"></i>
             <span id="error-text">حدث خطأ</span>
         </div>
 
-        <!-- قسم الدخول السريع (يظهر برمجياً إذا كان هناك حسابات محفوظة) -->
+        <!-- قسم الدخول السريع (البحث الحي الاحترافي) -->
         <div id="quick-login-section" class="hidden mb-6">
             <div class="flex items-center gap-3 mb-4">
                 <div class="h-px bg-slate-100 flex-1"></div>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">دخول سريع</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">الدخول السريع</span>
                 <div class="h-px bg-slate-100 flex-1"></div>
             </div>
-            <div id="saved-accounts-list" class="flex gap-4 overflow-x-auto pb-2 justify-center hide-scrollbar">
-                <!-- يتم حقن الحسابات هنا بواسطة JavaScript -->
+            
+            <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                <!-- شريط البحث -->
+                <div class="relative mb-3">
+                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="account-search" placeholder="ابحث عن متجرك أو حسابك..." class="w-full bg-white border border-slate-200 rounded-xl py-3 pr-9 pl-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm">
+                </div>
+
+                <!-- قائمة الحسابات (عمودية قابلة للتمرير) -->
+                <div id="saved-accounts-list" class="max-h-44 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                    <!-- يتم حقن الحسابات هنا -->
+                </div>
             </div>
         </div>
 
         <!-- نموذج تسجيل الدخول -->
-        <form id="login-form" class="space-y-4 md:space-y-5 relative">
+        <form id="login-form" class="space-y-4 relative mt-2">
             
-            <div class="space-y-1.5">
-                <label class="text-[11px] md:text-xs font-black text-slate-500 mr-2 block">اسم المستخدم أو رقم التواصل</label>
+            <div class="space-y-1.5 input-group">
+                <label class="text-[11px] font-black text-slate-500 px-1">اسم المستخدم أو رقم التواصل</label>
                 <div class="relative">
-                    <i class="fas fa-user absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                    <input 
-                        id="identifier" 
-                        type="text" 
-                        required 
-                        class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl py-3.5 md:py-4 pr-11 pl-4 font-bold text-slate-700 text-[16px] outline-none transition-all text-right shadow-sm"
-                        placeholder="أدخل الاسم أو رقم الموبايل"
-                    />
+                    <i class="fas fa-user absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors"></i>
+                    <input id="identifier" type="text" required class="w-full bg-slate-50 border-2 border-slate-100 focus:border-blue-500 focus:bg-white rounded-2xl py-3.5 pr-11 pl-4 font-bold text-slate-700 text-sm outline-none transition-all text-right shadow-sm placeholder-slate-300" placeholder="أدخل بيانات الدخول"/>
                 </div>
             </div>
 
-            <div class="space-y-1.5">
-                <label class="text-[11px] md:text-xs font-black text-slate-500 mr-2 block">كلمة المرور</label>
+            <div class="space-y-1.5 input-group">
+                <div class="flex justify-between items-center px-1">
+                    <label class="text-[11px] font-black text-slate-500">كلمة المرور</label>
+                    <button type="button" onclick="openRecoveryModal()" class="text-[10px] font-bold text-blue-600 hover:text-blue-800 transition-colors">نسيت كلمة المرور؟</button>
+                </div>
                 <div class="relative">
-                    <i class="fas fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                    <input 
-                        id="password" 
-                        type="password" 
-                        required 
-                        class="w-full bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl py-3.5 md:py-4 pr-11 pl-4 font-bold text-slate-700 text-[16px] outline-none transition-all text-left shadow-sm"
-                        placeholder="••••••••"
-                        dir="ltr"
-                    />
+                    <i class="fas fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors"></i>
+                    <input id="password" type="password" required class="w-full bg-slate-50 border-2 border-slate-100 focus:border-blue-500 focus:bg-white rounded-2xl py-3.5 pr-11 pl-4 font-bold text-slate-700 text-sm outline-none transition-all text-left tracking-widest shadow-sm placeholder-slate-300" placeholder="••••••••" dir="ltr"/>
                 </div>
             </div>
 
-            <!-- خيار تذكرني (تخزين الحساب للدخول السريع) -->
-            <div class="flex items-center justify-between pt-1">
-                <label class="flex items-center gap-2 cursor-pointer group">
-                    <div class="relative w-5 h-5 flex items-center justify-center bg-slate-100 border-2 border-slate-200 rounded-lg group-hover:border-blue-400 transition-colors">
-                        <input type="checkbox" id="remember-me" class="peer sr-only" checked>
-                        <i class="fas fa-check text-[10px] text-blue-600 opacity-0 peer-checked:opacity-100 transition-opacity absolute"></i>
-                    </div>
-                    <span class="text-[11px] md:text-xs font-bold text-slate-500 group-hover:text-slate-800 transition-colors select-none">حفظ بيانات الدخول</span>
-                </label>
-            </div>
-
-            <button 
-                id="submit-btn"
-                type="submit" 
-                class="w-full py-4 md:py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-base md:text-lg shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 active:scale-95"
-            >
+            <button id="submit-btn" type="submit" class="w-full mt-2 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-base shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-3 active:scale-95 group">
                 <span id="btn-text">دخول للنظام</span>
-                <i id="btn-icon" class="fas fa-arrow-left"></i>
+                <i id="btn-icon" class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
             </button>
         </form>
 
-        <div class="mt-8 text-center pt-6 border-t border-slate-100">
-            <a href="subscriptions.html" class="text-blue-600 font-bold text-sm md:text-base hover:text-blue-800 transition-colors">
-                ليس لديك حساب؟ إعداد النظام
+        <div class="mt-6 text-center pt-5 border-t border-slate-100">
+            <a href="subscriptions.html" class="inline-flex items-center gap-2 text-slate-500 font-bold text-sm hover:text-blue-600 transition-colors">
+                <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs"><i class="fas fa-plus"></i></div>
+                إعداد نشاط تجاري جديد
             </a>
         </div>
     </div>
 
-    <!-- Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js');
+    <!-- ============================================== -->
+    <!-- نافذة استعادة كلمة المرور (Security Key Modal) -->
+    <!-- ============================================== -->
+    <div id="recovery-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-enter relative">
+            <button onclick="closeRecoveryModal()" class="absolute top-4 left-4 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-rose-100 hover:text-rose-600 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
             
-            // هذا السطر يراقب إذا تم تحميل Service Worker جديد وتفعيله
-            // وبمجرد تفعيله يقوم بعمل ريفريش للصفحة ليعرض التعديلات الجديدة فوراً للعميل
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    window.location.reload();
-                    refreshing = true;
-                }
-            });
-        });
-    }
-</script>
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-lg font-black text-slate-800">استعادة حسابك</h3>
+                <p class="text-[10px] font-bold text-slate-400 mt-1">باستخدام مفتاح الأمان (Security Key)</p>
+            </div>
 
+            <form id="recovery-form" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black text-slate-500 px-1">اسم المستخدم أو الموبايل</label>
+                    <input type="text" id="rec-identifier" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-violet-500 text-right">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-violet-600 px-1">مفتاح الأمان (Security Key)</label>
+                    <input type="text" id="rec-key" required placeholder="A1B2-C3D4-E5F6" dir="ltr" class="w-full bg-violet-50 border border-violet-200 rounded-xl p-3 text-sm font-black tracking-widest outline-none focus:border-violet-500 text-center uppercase placeholder:text-violet-300 placeholder:tracking-normal placeholder:font-normal">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-500 px-1">كلمة المرور الجديدة</label>
+                    <input type="password" id="rec-new-pass" required dir="ltr" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold tracking-widest outline-none focus:border-violet-500 text-center">
+                </div>
+
+                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-3.5 rounded-xl shadow-lg shadow-violet-500/30 transition-all mt-2 active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> تعيين كلمة المرور
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Service Worker -->
     <script>
-        document.addEventListener("DOMContentLoaded", async () => {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js');
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) { window.location.reload(); refreshing = true; }
+                });
+            });
+        }
+    </script>
 
+    <!-- المنطق البرمجي (Login & Multi-tenant & Security Key) -->
+    <script>
+        let displayAccounts = [];
+        
+        document.addEventListener("DOMContentLoaded", async () => {
             // 1. فحص الجلسة
             if (localStorage.getItem('isLoggedIn') === 'true') {
                 window.location.replace('dashboard.html');
@@ -161,61 +233,83 @@
             }
 
             // ==========================================
-            // MULTI-TENANCY: بناء قائمة المحلات للدخول السريع
+            // بناء قائمة المحلات والبحث الحي الاحترافي
             // ==========================================
             const quickLoginSection = document.getElementById('quick-login-section');
             const savedAccountsList = document.getElementById('saved-accounts-list');
+            const searchInput = document.getElementById('account-search');
 
-            // نقرأ قائمة المحلات المسجلة على الجهاز
             const shopsList = JSON.parse(localStorage.getItem('mentra_shops_list') || '[]');
-            let savedAccounts = JSON.parse(localStorage.getItem('mentra_saved_accounts') || '[]');
-
-            // دمج المحلات مع الحسابات المحفوظة في العرض
-            const displayAccounts = shopsList.map(shop => ({
+            
+            displayAccounts = shopsList.map(shop => ({
                 identifier: shop.username,
                 name: shop.shopName,
                 dbName: shop.dbName
             }));
 
-            // دالة لرسم الحسابات المحفوظة
-            function renderSavedAccounts() {
+            // دالة الرسم بنظام القائمة العمودية
+            window.renderSavedAccounts = function(filterText = '') {
                 if (displayAccounts.length === 0) {
                     quickLoginSection.classList.add('hidden');
                     return;
                 }
+
                 quickLoginSection.classList.remove('hidden');
-                savedAccountsList.innerHTML = displayAccounts.map(acc => `
-                    <button type="button" onclick="selectQuickAccount('${acc.identifier}', '${acc.dbName}')" class="flex flex-col items-center gap-2 group transition-all w-16">
-                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white border-2 border-slate-200 text-slate-400 flex items-center justify-center text-xl font-black group-hover:border-blue-500 group-hover:text-blue-600 group-hover:bg-blue-50 shadow-sm transition-all active:scale-90">
+
+                const filteredAccounts = displayAccounts.filter(acc => 
+                    acc.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                    acc.identifier.toLowerCase().includes(filterText.toLowerCase())
+                );
+
+                if (filteredAccounts.length === 0) {
+                    savedAccountsList.innerHTML = `<p class="text-xs text-slate-400 font-bold py-6 w-full text-center bg-white border border-slate-100 rounded-xl">لا توجد حسابات مطابقة للبحث</p>`;
+                    return;
+                }
+
+                // تصميم Card احترافي لكل حساب
+                savedAccountsList.innerHTML = filteredAccounts.map(acc => `
+                    <button type="button" onclick="selectQuickAccount('${acc.identifier}', '${acc.dbName}')" class="w-full flex items-center gap-3 p-2.5 bg-white border border-slate-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm transition-all group active:scale-[0.98]">
+                        <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center text-lg font-black group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
                             ${acc.name.charAt(0)}
                         </div>
-                        <span class="text-[10px] font-bold text-slate-500 group-hover:text-blue-600 truncate w-full text-center" title="${acc.name}">${acc.name.split(' ')[0]}</span>
+                        <div class="text-right flex-1 overflow-hidden">
+                            <p class="text-sm font-black text-slate-800 group-hover:text-blue-700 truncate">${acc.name}</p>
+                            <p class="text-[10px] font-bold text-slate-400 truncate dir-ltr">${acc.identifier}</p>
+                        </div>
+                        <i class="fas fa-chevron-left text-slate-300 group-hover:text-blue-500 text-xs ml-1 transition-colors"></i>
                     </button>
                 `).join('');
-            }
+            };
 
-            // دالة عند الضغط على أحد الحسابات المحفوظة
+            // مراقب حقل البحث (Live Search)
+            searchInput.addEventListener('input', (e) => {
+                renderSavedAccounts(e.target.value);
+            });
+
+            // دالة اختيار الحساب
             window.selectQuickAccount = (identifier, dbName) => {
                 const idInput = document.getElementById('identifier');
                 const passInput = document.getElementById('password');
 
-                // تفعيل DB الخاص بهذا المحل عند الضغط عليه
                 if (dbName) tenantManager.switchTo(dbName);
 
                 idInput.value = identifier;
+                
+                // توجيه التركيز (Focus) لحقل الباسورد فوراً
                 passInput.value = '';
                 passInput.focus();
 
-                idInput.classList.add('ring-2', 'ring-blue-200');
-                setTimeout(() => idInput.classList.remove('ring-2', 'ring-blue-200'), 500);
+                // تأثير بصري للحقل لتنبيه المستخدم
+                idInput.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
+                setTimeout(() => idInput.classList.remove('ring-2', 'ring-blue-400', 'bg-blue-50'), 400);
             };
 
-            // تشغيل دالة الرسم عند التحميل
+            // تشغيل الدالة أول مرة
             renderSavedAccounts();
 
 
             // ==========================================
-            // معالجة نموذج تسجيل الدخول
+            // معالجة تسجيل الدخول الأساسي
             // ==========================================
             const form = document.getElementById('login-form');
             const errorDiv = document.getElementById('error-message');
@@ -223,14 +317,11 @@
             const submitBtn = document.getElementById('submit-btn');
             const btnText = document.getElementById('btn-text');
             const btnIcon = document.getElementById('btn-icon');
-            const rememberMe = document.getElementById('remember-me');
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 errorDiv.classList.add('hidden');
                 submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-75');
                 btnText.innerText = 'جاري التحقق...';
                 btnIcon.className = 'fas fa-spinner fa-spin';
 
@@ -238,41 +329,25 @@
                 const password = document.getElementById('password').value;
 
                 try {
-                    // ============================================================
-                    // MULTI-TENANCY: البحث في كل قواعد البيانات المسجلة على الجهاز
-                    // ============================================================
                     const shops = JSON.parse(localStorage.getItem('mentra_shops_list') || '[]');
                     let foundUser = null;
                     let foundDBName = null;
                     let foundShopName = null;
 
-                    // إذا في DB نشط حالياً ابحث فيه أولاً
                     const currentDB = localStorage.getItem('mentra_current_db');
-                    const searchOrder = currentDB
-                        ? [currentDB, ...shops.map(s => s.dbName).filter(d => d !== currentDB)]
-                        : shops.map(s => s.dbName);
+                    const searchOrder = currentDB ? [currentDB, ...shops.map(s => s.dbName).filter(d => d !== currentDB)] : shops.map(s => s.dbName);
 
                     for (const dbName of searchOrder) {
                         try {
                             const searchDB = new Dexie(dbName);
                             searchDB.version(4).stores({
-                                settings: 'id, project_name, shop_name, phone, logo',
                                 local_users: '++id, username, full_name, role',
-                                active_session: 'id, user_id, login_time',
-                                products: '++id, name_ar, sku, category, stock_qty, price, cost',
-                                invoices: '++id, invoice_number, type, customer_vendor_id, date, total, status',
-                                invoice_items: '++id, invoice_id, product_id, price, qty, total_item',
-                                accounts: '++id, code, name_ar, type, balance',
-                                journal: '++id, date, ref_no, description, total',
-                                journal_items: '++id, journal_id, account_id, debit, credit',
-                                stock_movements: '++id, product_id, type, qty, date, ref_id'
+                                active_session: 'id, user_id, login_time'
                             });
                             await searchDB.open();
 
                             const user = await searchDB.local_users.filter(u => {
-                                const matchUsername = u.username && u.username.toLowerCase() === identifier.toLowerCase();
-                                const matchPhone = u.phone && u.phone === identifier;
-                                return matchUsername || matchPhone;
+                                return (u.username && u.username.toLowerCase() === identifier.toLowerCase()) || (u.phone && u.phone === identifier);
                             }).first();
 
                             if (user && user.password === password) {
@@ -281,55 +356,107 @@
                                 const shopInfo = shops.find(s => s.dbName === dbName);
                                 foundShopName = shopInfo ? shopInfo.shopName : user.full_name;
 
-                                // تفعيل الجلسة في الـ DB الصحيح
                                 await searchDB.active_session.clear();
                                 await searchDB.active_session.add({ id: 1, user_id: user.id, login_time: new Date().toISOString() });
                                 break;
                             }
                             await searchDB.close();
-                        } catch(dbErr) {
-                            console.warn(`تخطي DB: ${dbName}`, dbErr);
-                        }
+                        } catch(dbErr) { console.warn(`تخطي DB: ${dbName}`); }
                     }
 
                     if (foundUser) {
-                        // تفعيل الـ DB الصحيح لهذا المحل
                         tenantManager.switchTo(foundDBName);
-
-                        // حفظ الجلسة في LocalStorage
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem('userName', foundUser.full_name);
                         localStorage.setItem('userRole', foundUser.role);
 
                         btnText.innerText = `مرحباً بك في ${foundShopName}`;
                         btnIcon.className = 'fas fa-check';
-                        submitBtn.classList.replace('bg-blue-600', 'bg-emerald-500');
+                        submitBtn.classList.replace('from-blue-600', 'from-emerald-500');
+                        submitBtn.classList.replace('to-indigo-600', 'to-emerald-600');
 
-                        setTimeout(() => {
-                            window.location.replace('dashboard.html');
-                        }, 700);
-
+                        setTimeout(() => { window.location.replace('dashboard.html'); }, 700);
                     } else {
-                        errorText.innerText = 'البيانات غير صحيحة، تأكد من اسم المستخدم أو كلمة المرور.';
-                        errorDiv.classList.remove('hidden');
-                        resetButton();
+                        showError('بيانات الدخول غير صحيحة!');
                     }
                 } catch (err) {
-                    console.error(err);
-                    errorText.innerText = 'فشل الاتصال بقاعدة البيانات المحلية!';
-                    errorDiv.classList.remove('hidden');
-                    resetButton();
+                    showError('فشل الاتصال بقاعدة البيانات المحلية!');
                 }
             });
 
-            function resetButton() {
+            function showError(msg) {
+                errorText.innerText = msg;
+                errorDiv.classList.remove('hidden');
                 submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-75');
                 btnText.innerText = 'دخول للنظام';
-                btnIcon.className = 'fas fa-arrow-left';
+                btnIcon.className = 'fas fa-arrow-left group-hover:-translate-x-1 transition-transform';
             }
 
-            renderSavedAccounts();
+
+            // ==========================================
+            // معالجة استعادة كلمة المرور (Security Key)
+            // ==========================================
+            const recoveryModal = document.getElementById('recovery-modal');
+            const recoveryForm = document.getElementById('recovery-form');
+
+            window.openRecoveryModal = () => {
+                recoveryModal.classList.remove('hidden');
+                recoveryModal.classList.add('flex');
+                document.getElementById('rec-identifier').value = document.getElementById('identifier').value; // نسخ الاسم إن وجد
+            };
+
+            window.closeRecoveryModal = () => {
+                recoveryModal.classList.add('hidden');
+                recoveryModal.classList.remove('flex');
+                recoveryForm.reset();
+            };
+
+            recoveryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const recId = document.getElementById('rec-identifier').value.trim();
+                const recKey = document.getElementById('rec-key').value.trim().toUpperCase();
+                const newPass = document.getElementById('rec-new-pass').value;
+
+                try {
+                    const shops = JSON.parse(localStorage.getItem('mentra_shops_list') || '[]');
+                    let accountRecovered = false;
+
+                    for (const dbName of shops.map(s => s.dbName)) {
+                        const searchDB = new Dexie(dbName);
+                        searchDB.version(4).stores({ local_users: '++id, username, full_name, role' });
+                        await searchDB.open();
+
+                        const user = await searchDB.local_users.filter(u => {
+                            return (u.username && u.username.toLowerCase() === recId.toLowerCase()) || (u.phone && u.phone === recId);
+                        }).first();
+
+                        if (user && user.security_key === recKey) {
+                            await searchDB.local_users.update(user.id, { password: newPass });
+                            accountRecovered = true;
+                            break;
+                        }
+                        await searchDB.close();
+                    }
+
+                    if (accountRecovered) {
+                        Swal.fire({
+                            icon: 'success', title: 'تم بنجاح', text: 'تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن.',
+                            customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2 bg-violet-600' }
+                        });
+                        document.getElementById('identifier').value = recId;
+                        document.getElementById('password').value = newPass;
+                        closeRecoveryModal();
+                    } else {
+                        Swal.fire({
+                            icon: 'error', title: 'فشل الاستعادة', text: 'اسم المستخدم أو مفتاح الأمان غير صحيح!',
+                            customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
+                        });
+                    }
+                } catch (err) {
+                    Swal.fire('خطأ', 'حدث خطأ أثناء محاولة الاستعادة', 'error');
+                }
+            });
+
         });
     </script>
 </body>

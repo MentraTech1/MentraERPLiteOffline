@@ -2,369 +2,468 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- منع التكبير العشوائي وضبط أبعاد الشاشة للموبايل بدقة -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    
-    <!-- تلوين شريط إشعارات الأندرويد باللون الكحلي ليتماشى مع القائمة الجانبية -->
-    <meta name="theme-color" content="#0b1120">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1e40af">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
+    <title>Mentra ERP Lite | لوحة التحكم</title>
+    
     <link rel="icon" href="assets/img/smalicon.png">
     <link rel="apple-touch-icon" href="assets/img/smalicon.png">
-    <title>MENTRA ERP | لوحة التحكم</title>
+    <link rel="manifest" href="manifest.json">
     
+    <!-- خطوط جوجل -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap">
+
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="assets/Tailwind.js"></script>
-    <script src="assets/dexie.min.js"></script>
-    <script src="assets/sweetalert2@11.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- مكتبات مساعدة لـ ERP -->
+    <script src="assets/sweetalert2@11.js"></script>
     <script src="assets/axios.min.js"></script>
     <script src="assets/xlsx.full.min.js"></script>
-    
-    <!-- الأنماط المخصصة للنظام -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    
-    <!-- Backup Manager Libraries -->
-    <script src="assets/js/BackupManager.js"></script>
-    <script src="assets/js/backupFunctions.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
-        
-:root { 
-    --accent: var(--primary-600); 
-    --accent-glow: rgba(59, 130, 246, 0.4); 
-}
-        
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: #f8fafc; 
-            color: #0f172a; 
-            overflow: hidden; 
-            /* إخفاء مربع اللمس الأزرق في متصفحات الأندرويد */
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Sidebar Styling & Animation */
-        #sidebar { transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1); z-index: 50; }
-        
-        .nav-btn { transition: all 0.2s ease; border-right: 3px solid transparent; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); border-right-color: rgba(255,255,255,0.2); transform: translateX(-4px); }
-        .nav-btn:active { transform: scale(0.98); } /* تأثير ضغطة الموبايل */
-        
-        .nav-btn.active-tab { 
-            background: linear-gradient(90deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 100%); 
-            border-right-color: var(--accent); 
-            color: white; 
-            font-weight: 700; 
-        }
-        .nav-btn.active-tab i { color: #60a5fa; text-shadow: 0 0 10px var(--accent-glow); }
-        
-        /* Glassmorphism Header */
-        .glass-header { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8); 
-        }
-        
-        /* Animations */
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .module-enter { animation: fadeSlideUp 0.4s ease-out forwards; }
 
-        /* Custom Scrollbar for Desktop */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    <!-- React, ReactDOM, Babel & Dexie -->
+    <script crossorigin src="assets/react.production.min.js"></script>
+    <script crossorigin src="assets/react-dom.production.min.js"></script>
+    <script src="assets/babel.min.js"></script>
+    <script src="assets/dexie.min.js"></script>
 
-        /* Mobile Adjustments (شاشات الهواتف) */
-        @media (max-width: 768px) {
-            #sidebar { 
-                position: fixed; 
-                top: 0;
-                right: 0; /* التثبيت في اليمين للغة العربية */
-                height: 100%; 
-                transform: translateX(100%); /* إخفاء القائمة خارج الشاشة يميناً */
-                box-shadow: -15px 0 30px rgba(0,0,0,0.4); 
-            }
-            #sidebar.active { 
-                transform: translateX(0); /* إظهار القائمة */
-            }
-            /* منع السكرول للصفحة الخلفية عند فتح القائمة */
-            body.sidebar-open { overflow: hidden; touch-action: none; }
-        }
-    </style>
-</head>
-<body class="flex h-[100dvh] overflow-hidden relative">
-
-    <!-- Overlay (الخلفية المعتمة عند فتح القائمة في الموبايل) -->
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
-
-    <!-- Sidebar (القائمة الجانبية) -->
-    <aside id="sidebar" class="w-[80%] md:w-72 max-w-[300px] bg-[#0b1120] text-slate-400 flex flex-col border-l border-slate-800 shrink-0">
-        <div class="h-16 md:h-20 flex items-center justify-between px-4 md:px-6 border-b border-slate-800/60 shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg transform rotate-3">
-                    <i class="fas fa-chart-line text-sm md:text-xl"></i>
-                </div>
-                <div>
-                    <span class="text-white font-black text-xl md:text-2xl tracking-tighter block leading-none">Mentra ERP Lite</span>
-                    <span class="text-[8px] md:text-[9px] font-bold text-blue-500 uppercase tracking-[0.2em] opacity-80 leading-none">Enterprise ERP</span>
-                </div>
-            </div>
-            <!-- زر إغلاق القائمة في الموبايل -->
-            <button onclick="toggleSidebar()" class="md:hidden w-8 h-8 flex items-center justify-center bg-slate-800 rounded-lg text-slate-300 hover:text-white hover:bg-rose-500 transition-colors active:scale-90">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <nav id="nav-container" class="flex-1 py-4 md:py-6 px-3 md:px-4 space-y-1 overflow-y-auto"></nav>
-
-        <div class="p-4 border-t border-slate-800/60 bg-slate-900/50 shrink-0 pb-safe">
-            <div class="flex items-center gap-3 mb-4 px-1">
-                <div class="relative">
-                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold border border-slate-600 shadow-inner" id="user-initial">U</div>
-                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0b1120] rounded-full"></div>
-                </div>
-                <div class="overflow-hidden flex-1">
-                    <p class="text-white font-bold text-sm truncate" id="user-name">جاري التحميل...</p>
-                    <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-tight" id="user-role">مسؤول النظام</p>
-                </div>
-            </div>
-            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 p-3 text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl transition font-black text-xs uppercase tracking-widest active:scale-95">
-                <i class="fas fa-power-off"></i> إنهاء الجلسة
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col min-w-0 bg-[#f8fafc] relative w-full">
-        
-        <!-- Header -->
-        <header class="h-16 md:h-20 glass-header flex items-center justify-between px-4 md:px-10 absolute top-0 w-full z-30 shadow-sm">
-            <div class="flex items-center gap-3">
-                <!-- زر فتح القائمة (Mobile Menu Button) -->
-                <button onclick="toggleSidebar()" class="md:hidden flex items-center justify-center w-10 h-10 bg-white border border-slate-200 text-slate-700 rounded-xl shadow-sm hover:text-blue-600 active:scale-90 transition-all">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                
-                <div class="flex flex-col justify-center">
-                    <h2 id="page-title" class="font-black text-lg md:text-2xl text-slate-800 leading-tight">الرئيسية</h2>
-                    <span id="page-subtitle" class="text-[9px] md:text-xs text-slate-500 font-bold italic truncate max-w-[150px] sm:max-w-none">Mentra ERP System</span>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3 md:gap-4">
-                <div id="storage-status" class="hidden sm:flex flex-col items-end">
-                    <span id="storage-label" class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">المساحة المحلية</span>
-                    <span id="storage-indicator" class="text-[10px] font-bold text-blue-600">-- MB</span>
-                </div>
-                
-                <div class="h-6 md:h-8 w-[1px] bg-slate-200 hidden sm:block mx-1"></div>
-                
-                <div class="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-600 bg-white px-3 md:px-4 py-2 rounded-full shadow-sm border border-slate-200">
-                    <i class="far fa-calendar-alt text-blue-500 hidden sm:inline-block"></i>
-                    <span id="system-date"></span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Dynamic Content Container -->
-        <!-- استخدام h-[100dvh] pt-20 للأندرويد لضمان عدم اختفاء المحتوى خلف شريط التصفح السفلي -->
-        <div class="flex-1 overflow-y-auto pt-20 md:pt-24 px-3 md:px-10 pb-10" id="main-scroll-area">
-            <div id="main-content-display" class="w-full h-full max-w-7xl mx-auto module-enter"></div>
-        </div>
-    </main>
-
+    <!-- ملفات النظام الأساسية للنسخ الاحتياطي والمزامنة وقاعدة البيانات -->
     <script src="assets/js/db-init.js"></script>
     <script src="assets/js/BackupManager.js"></script>
     <script src="assets/js/syncManager.js"></script>
+    <script src="assets/js/backupFunctions.js"></script>
+	<script src="assets/js/JournalManager.js"></script>
+
+    <!-- تنسيقات ERP العامة -->
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #f8fafc; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        
+        /* تنسيق الأزرار الجانبية الفعالة */
+        .nav-active { 
+            background: linear-gradient(90deg, rgba(37,99,235,0.15) 0%, rgba(37,99,235,0) 100%); 
+            border-right: 3px solid #2563eb; 
+            color: white; 
+            font-weight: 800; 
+        }
+        .nav-active i { color: #60a5fa; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        
+        .animate-view { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .toast-enter { animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    
+    <!-- شاشة التحميل المبدئية (Smart Loader) -->
+    <style>
+        #initial-loader { position: fixed; inset: 0; background: #0b1120; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; }
+        #initial-loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-spinner { width: 56px; height: 56px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    <div id="initial-loader">
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#2563eb,#4f46e5);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 25px rgba(37,99,235,0.4); transform: rotate(3deg);">
+            <i class="fas fa-chart-line text-white text-3xl"></i>
+        </div>
+        <div class="loader-spinner"></div>
+        <p style="margin-top:16px;font-family:system-ui,sans-serif;font-weight:800;color:#94a3b8;font-size:13px;letter-spacing:1px">جاري تحميل نظام Mentra ERP...</p>
+    </div>
+    
     <script>
-        // إنشاء MentraSync للاستخدام في الإجراءات السريعة
-        window.MentraSync = window.syncManager;
-    </script>
-    <script>
-        // --- 1. CONFIG & RBAC ---
-        const RBAC_Matrix = {
-            'main': { roles: ['admin', 'manager'], title: 'الرئيسية', icon: 'fa-th-large', desc: 'نظرة عامة على النظام' },
-            'sales': { roles: ['admin', 'manager', 'cashier'], title: 'كاشير المبيعات', icon: 'fa-cash-register', desc: 'نقاط البيع السريعة POS' },
-            'sales_report': { roles: ['admin', 'manager'], title: 'سجل المبيعات', icon: 'fa-file-invoice', desc: 'تقارير المبيعات التفصيلية' },
-            'purchases': { roles: ['admin', 'manager'], title: 'فاتورة مشتريات', icon: 'fa-shopping-cart', desc: 'إدارة المشتريات والموردين' },
-            'purchases_report': { roles: ['admin', 'manager'], title: 'سجل المشتريات', icon: 'fa-history', desc: 'أرشيف فواتير المشتريات' },
-            'Inventory': { roles: ['admin', 'manager'], title: 'المخازن والجرد', icon: 'fa-boxes-stacked', desc: 'إدارة الأصناف والمستودعات' },
-            'accounts': { roles: ['admin'], title: 'دليل الحسابات', icon: 'fa-users-cog', desc: 'إدارة شجرة الحسابات' },
-            'profit_report': { roles: ['admin', 'manager'], title: 'تقرير الأرباح', icon: 'fa-chart-line', desc: 'تحليل الأرباح والخسائر وهوامش الربع' },
-            'journal': { roles: ['admin'], title: 'القيود اليومية', icon: 'fa-book', desc: 'قيود اليومية المحاسبية' },
-			'returns': { roles: ['admin', 'manager'], title: 'المرتجعات', icon: 'fa-undo-alt', desc: 'استرداد بضاعة ورد نقدية' },
-			'returns_log': { roles: ['admin', 'manager'], title: 'سجل المرتجعات', icon: 'fa-history', desc: 'عرض كافة حركات المرتجعات السابقة' },
-            'system_info': { roles: ['admin'], title: 'بيانات النظام', icon: 'fa-database', desc: 'حالة قاعدة البيانات والنسخ الاحتياطي' },
-            'settings': { roles: ['admin', 'manager'], title: 'إعدادات المستخدم', icon: 'fa-cog', desc: 'تخصيص واجهة المستخدم' },
-            'purchases': { roles: ['admin', 'manager'], title: 'مشتريات', icon: 'fa-shopping-cart', desc: 'إدارة المشتريات والموردين' },
-            'purchases_report': { roles: ['admin', 'manager'], title: 'سجل المشتريات', icon: 'fa-history', desc: 'أرشيف المشتريات' },
-            'accounts': { roles: ['admin'], title: 'دليل الحسابات', icon: 'fa-users-cog', desc: 'شجرة الحسابات' },
-            'journal': { roles: ['admin'], title: 'القيود اليومية', icon: 'fa-book', desc: 'القيود المحاسبية' },
-            'system_info': { roles: ['admin'], title: 'النسخ الاحتياطي', icon: 'fa-database', desc: 'البيانات والإعدادات' },
-            'settings': { roles: ['admin', 'manager'], title: 'إعدادات النظام', icon: 'fa-cog', desc: 'تخصيص الواجهة' }
-        };
-
-        const userSession = {
-            isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
-            name: localStorage.getItem('userName') || 'مستخدم غير معروف',
-            role: 'admin' 
-        };
-
-        if (!userSession.isLoggedIn) {
-            window.location.replace('login.html');
-        }
-
-        // --- 2. UI ENGINE ---
-        function initUI() {
-            document.getElementById('user-name').innerText = userSession.name;
-            document.getElementById('user-initial').innerText = userSession.name.charAt(0);
-            
-            // تاريخ مختصر للموبايل
-            const dateOptions = window.innerWidth < 768 
-                ? { year: 'numeric', month: 'numeric', day: 'numeric' } 
-                : { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('system-date').innerText = new Date().toLocaleDateString('ar-EG', dateOptions);
-
-            const nav = document.getElementById('nav-container');
-            
-            nav.innerHTML = Object.entries(RBAC_Matrix).map(([id, config]) => {
-                let header = '';
-                if (id === 'sales') header = `<p class="text-[9px] font-black text-slate-600 px-3 mt-4 mb-1.5 uppercase tracking-widest">التجارة</p>`;
-                if (id === 'inventory') header = `<p class="text-[9px] font-black text-slate-600 px-3 mt-4 mb-1.5 uppercase tracking-widest">المالية والمخازن</p>`;
-                if (id === 'system_info') header = `<p class="text-[9px] font-black text-slate-600 px-3 mt-4 mb-1.5 uppercase tracking-widest">النظام</p>`;
-
-                return `
-                    ${header}
-                    <button onclick="executeModuleLoad('${id}', this)" id="btn-${id}" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-slate-400 text-sm font-bold">
-                        <i class="fas ${config.icon} w-5 text-center text-lg opacity-80"></i> 
-                        <span class="truncate">${config.title}</span>
-                    </button>
-                `;
-            }).join('');
-
-            executeModuleLoad('main', document.getElementById('btn-main'));
-            updateStorageInfo();
-        }
-
-        async function executeModuleLoad(moduleId, btnElement) {
-            const config = RBAC_Matrix[moduleId];
-            
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
-            if(btnElement) btnElement.classList.add('active-tab');
-            
-            document.getElementById('page-title').innerText = config.title;
-            document.getElementById('page-subtitle').innerText = config.desc;
-            
-            // إغلاق القائمة تلقائياً في الموبايل عند اختيار قسم
-            if(window.innerWidth < 768 && document.getElementById('sidebar').classList.contains('active')) {
-                toggleSidebar();
-            }
-
-            const container = document.getElementById('main-content-display');
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-64 space-y-4">
-                    <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-                    <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">جاري جلب البيانات...</p>
-                </div>`;
-
-            try {
-                const res = await fetch(`pages/${moduleId}.js?v=${Date.now()}`);
-                if (!res.ok) throw new Error();
-                const rawScript = await res.text();
-                
-                document.querySelectorAll('.dynamic-module-script').forEach(s => s.remove());
-                container.classList.remove('module-enter');
-                void container.offsetWidth; 
-                container.classList.add('module-enter');
-
-                const scriptEl = document.createElement('script');
-                scriptEl.className = 'dynamic-module-script';
-                scriptEl.text = `(() => { try { ${rawScript} } catch(e) { console.error("ERP Module Error:", e); } })();`;
-                document.body.appendChild(scriptEl);
-                updateStorageInfo();
-            } catch (err) {
-                container.innerHTML = `
-                    <div class="text-center p-10 mt-10 border-2 border-dashed border-slate-200 bg-white rounded-[2rem]">
-                        <i class="fas fa-tools text-4xl text-slate-300 mb-4 block"></i>
-                        <p class="text-slate-500 font-bold text-sm">قسم "${config.title}" قيد التطوير حالياً.</p>
-                    </div>`;
-            }
-        }
-
-        // --- 3. UTILITIES ---
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const body = document.body;
-
-            sidebar.classList.toggle('active');
-            
-            if (sidebar.classList.contains('active')) {
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.add('opacity-100'), 10);
-                body.classList.add('sidebar-open'); // منع السكرول
-            } else {
-                overlay.classList.remove('opacity-100');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-                body.classList.remove('sidebar-open'); // إعادة السكرول
-            }
-        }
-
-        function updateStorageInfo() {
-            if (navigator.storage && navigator.storage.estimate) {
-                navigator.storage.estimate().then(est => {
-                    const used = (est.usage / (1024 * 1024)).toFixed(1);
-                    document.getElementById('storage-indicator').innerText = `${used} MB`;
-                });
-            }
-        }
-
-        async function handleLogout() {
-            const result = await Swal.fire({
-                title: 'إنهاء الجلسة؟',
-                text: "لن يتم مسح بياناتك، فقط سيتم الخروج.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، خروج',
-                cancelButtonText: 'إلغاء',
-                background: '#ffffff',
-                color: '#0f172a',
-                confirmButtonColor: '#3b82f6',
-                cancelButtonColor: '#ef4444',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl font-bold',
-                    cancelButton: 'rounded-xl font-bold'
+        var loaderEl = document.getElementById("initial-loader");
+        document.addEventListener("DOMContentLoaded", function() {
+            var root = document.getElementById("root");
+            if (!root) return;
+            var loaderObserver = new MutationObserver(function() {
+                if (root.children.length > 0) {
+                    loaderEl.classList.add("hidden");
+                    setTimeout(function(){ loaderEl.remove(); }, 500);
+                    loaderObserver.disconnect();
                 }
             });
+            loaderObserver.observe(root, { childList: true });
+        });
+    </script>
+    
+    <!-- الحاوية الأساسية لتطبيق React -->
+    <div id="root" class="h-full w-full"></div>
 
-            if (result.isConfirmed) {
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef, useMemo } = React;
+        const { liveQuery } = Dexie;
+
+        // Hook لقراءة البيانات حياً من قاعدة البيانات (مثل تحديث المنتجات أو الفواتير لحظياً)
+        window.useLiveQuery = function(querier, deps = []) {
+            const [value, setValue] = useState(undefined);
+            useEffect(() => {
+                const subscription = liveQuery(querier).subscribe({ 
+                    next: val => setValue(val), 
+                    error: err => console.error("DB LiveQuery Error:", err) 
+                });
+                return () => subscription.unsubscribe();
+            }, deps);
+            return value;
+        };
+
+        // مصيدة الأخطاء (تمنع الشاشة البيضاء عند حدوث خطأ برمجي)
+        class ErrorBoundary extends React.Component {
+            constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+            static getDerivedStateFromError(error) { return { hasError: true, error }; }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="flex flex-col items-center justify-center h-screen bg-slate-50 p-6 text-center animate-view">
+                            <i className="fas fa-exclamation-triangle text-6xl text-rose-500 mb-4 animate-bounce"></i>
+                            <h2 className="text-2xl font-black text-slate-800">حدث خطأ تقني في الشاشة</h2>
+                            <p className="text-slate-500 mt-2 text-sm">{String(this.state.error)}</p>
+                            <button onClick={() => window.location.reload()} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl mt-4 font-bold shadow-lg transition-all active:scale-95">إعادة تحميل النظام</button>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
+        // مكون الإشعارات المنبثقة التلقائية
+        function Toast({ message, type, onClose }) {
+            const colors = type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' : 'bg-rose-50 text-rose-700 border-rose-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
+            return (
+                <div className="fixed bottom-20 md:bottom-10 left-1/2 -translate-x-1/2 z-[999] toast-enter w-[90%] max-w-sm">
+                    <div className={`${colors} border-r-4 p-4 rounded-xl shadow-2xl flex items-center gap-3 backdrop-blur-md bg-white/95`}>
+                        <i className={`fas ${icon} text-xl`}></i>
+                        <p className="font-bold text-sm flex-1">{message}</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // =========================================================================
+        // هيكلية شاشات ERP وصلاحياتها (ربط اسم الموديول بالـ Component)
+        // =========================================================================
+        const Menu_Matrix = {
+            'main':             { roles: ['admin', 'manager'], title: 'الرئيسية', icon: 'fa-chart-pie', componentName: 'Module_Main', category: null },
+            'sales':            { roles: ['admin', 'manager', 'cashier'], title: 'كاشير المبيعات', icon: 'fa-cash-register', componentName: 'Module_Sales', category: 'التجارة والمبيعات' },
+            'sales_report':     { roles: ['admin', 'manager'], title: 'سجل المبيعات', icon: 'fa-file-invoice', componentName: 'Module_SalesReport', category: null },
+            'returns':          { roles: ['admin', 'manager'], title: 'المرتجعات', icon: 'fa-undo-alt', componentName: 'Module_Returns', category: null },
+            'returns_log':      { roles: ['admin', 'manager'], title: 'سجل المرتجعات', icon: 'fa-receipt', componentName: 'Module_ReturnsLog', category: null },
+            'purchases':        { roles: ['admin', 'manager'], title: 'فاتورة مشتريات', icon: 'fa-shopping-cart', componentName: 'Module_Purchases', category: null },
+            'purchases_report': { roles: ['admin', 'manager'], title: 'سجل المشتريات', icon: 'fa-history', componentName: 'Module_PurchasesReport', category: null },
+            
+            'inventory':        { roles: ['admin', 'manager'], title: 'المخازن والجرد', icon: 'fa-boxes-stacked', componentName: 'Module_Inventory', category: 'المالية والمخازن' },
+            'accounts':         { roles: ['admin'], title: 'دليل الحسابات', icon: 'fa-users-cog', componentName: 'Module_Accounts', category: null },
+            'journal':          { roles: ['admin'], title: 'القيود اليومية والمصروفات', icon: 'fa-book', componentName: 'Module_Journal', category: null },
+            'profit_report':    { roles: ['admin', 'manager'], title: 'تقرير الأرباح', icon: 'fa-chart-line', componentName: 'Module_ProfitReport', category: null },
+
+            'system_info':      { roles: ['admin'], title: 'النسخ الاحتياطي', icon: 'fa-database', componentName: 'Module_SystemInfo', category: 'النظام' },
+            'settings':         { roles: ['admin', 'manager'], title: 'إعدادات النظام', icon: 'fa-cog', componentName: 'Module_Settings', category: null }
+        };
+
+        const Role_Names = { 'admin': 'مسؤول النظام', 'manager': 'مدير', 'cashier': 'كاشير' };
+
+        function DashboardApp() {
+            // حالة الجلسة
+            const [session, setSession] = useState(null);
+            const [dbReady, setDbReady] = useState(false);
+            const [activeModule, setActiveModule] = useState('main');
+            
+            // حالة الواجهة
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [toast, setToast] = useState(null);
+            const [isModuleLoading, setIsModuleLoading] = useState(true);
+            const [storageUsed, setStorageUsed] = useState('-- MB');
+            const [systemDate, setSystemDate] = useState('');
+
+            const showToast = useCallback((message, type = 'success') => setToast({ message, type, id: Date.now() }), []);
+
+            // 1. التحقق من تسجيل الدخول وقاعدة البيانات
+            useEffect(() => {
+                const initApp = async () => {
+                    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                    if (!isLoggedIn) {
+                        window.location.replace('login.html');
+                        return;
+                    }
+
+                    setSession({
+                        name: localStorage.getItem('userName') || 'مستخدم',
+                        role: localStorage.getItem('userRole') || 'admin',
+                        dbName: localStorage.getItem('mentra_current_db') || 'MentraLocalCache'
+                    });
+
+                    // افتراض أن db-init.js يعرّف window.db أو نقوم بتعريفه هنا
+                    if(typeof Dexie !== 'undefined') {
+                        setDbReady(true);
+                    }
+                };
+                initApp();
+            }, []);
+
+            // حساب التخزين والتاريخ
+            useEffect(() => {
+                if (navigator.storage && navigator.storage.estimate) {
+                    navigator.storage.estimate().then(est => setStorageUsed((est.usage / (1024 * 1024)).toFixed(1) + ' MB'));
+                }
+                const opts = window.innerWidth < 768 ? { year: 'numeric', month: 'numeric', day: 'numeric' } : { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                setSystemDate(new Date().toLocaleDateString('ar-EG', opts));
+            }, [activeModule]); // تحديث خفيف مع التنقل
+
+            // 2. المحمل الديناميكي للشاشات (Dynamic Script Injector - The Secret Sauce)
+            useEffect(() => {
+                if (!dbReady) return; 
+
+                const loadActiveModule = async () => {
+                    const cfg = Menu_Matrix[activeModule];
+                    if (!cfg) return;
+
+                    const compName = cfg.componentName;
+                    
+                    // إذا كان المكون محمل مسبقاً، اعرضه فوراً
+                    if (window[compName]) {
+                        setIsModuleLoading(false);
+                        return;
+                    }
+
+                    setIsModuleLoading(true);
+                    try {
+                        // إضافة Date.now() لمنع الكاش وجلب التعديلات الجديدة دائماً
+                        const response = await fetch(`pages/${activeModule}.js?v=${Date.now()}`);
+                        if (!response.ok) throw new Error("ملف الشاشة مفقود");
+                        
+                        const jsxCode = await response.text();
+                        // ترجمة كود الـ React (JSX) إلى JS عادي يمكن للمتصفح فهمه
+                        const compiledCode = Babel.transform(jsxCode, { presets: ['react'] }).code;
+                        
+                        // تنظيف أي سكربت قديم لنفس الشاشة لتفادي تكرار الذاكرة
+                        const oldScript = document.getElementById(`script-module-${activeModule}`);
+                        if (oldScript) oldScript.remove();
+
+                        const script = document.createElement('script');
+                        script.id = `script-module-${activeModule}`;
+                        script.type = 'text/javascript';
+                        script.text = compiledCode;
+                        document.body.appendChild(script);
+
+                        // إعطاء المتصفح لحظة لتنفيذ السكربت وتسجيل الكومبوننت في window
+                        setTimeout(() => setIsModuleLoading(false), 50);
+
+                    } catch (error) {
+                        console.error("خطأ في تحميل الموديول:", error);
+                        setIsModuleLoading(false);
+                    }
+                };
+
+                loadActiveModule();
+            }, [activeModule, dbReady]);
+
+            // إنهاء الجلسة عبر SweetAlert
+            const handleLogout = async () => {
+                if(typeof Swal !== 'undefined') {
+                    const result = await Swal.fire({
+                        title: 'إنهاء الجلسة؟',
+                        text: "لن يتم مسح بياناتك، فقط سيتم الخروج.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'نعم، خروج',
+                        cancelButtonText: 'إلغاء',
+                        confirmButtonColor: '#2563eb',
+                        cancelButtonColor: '#ef4444',
+                    });
+                    if (result.isConfirmed) proceedLogout();
+                } else {
+                    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) proceedLogout();
+                }
+            };
+
+            const proceedLogout = () => {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('userName');
                 window.location.replace('login.html');
-            }
+            };
+
+            if (!session) return null;
+
+            // فلترة القائمة الجانبية بناءً على دور المستخدم
+            const allowedMenus = Object.entries(Menu_Matrix).filter(([id, cfg]) => cfg.roles.includes(session.role));
+            
+            // جلب المكون المطلوب رندرته الآن
+            const activeComponentName = Menu_Matrix[activeModule]?.componentName;
+            const ActiveComponent = window[activeComponentName];
+
+            return (
+                <div className="flex h-screen w-full relative bg-slate-50">
+                    {toast && <Toast key={toast.id} message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                    
+                    {/* خلفية معتمة للهاتف عند فتح القائمة */}
+                    <div onClick={() => setIsSidebarOpen(false)} className={`fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[90] md:hidden transition-opacity ${isSidebarOpen ? 'opacity-100 block' : 'opacity-0 hidden'}`}></div>
+
+                    {/* القائمة الجانبية (Sidebar) */}
+                    <aside className={`w-[80%] max-w-[300px] md:w-72 bg-[#0b1120] text-slate-400 flex flex-col shadow-2xl fixed inset-y-0 right-0 z-[100] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 border-l border-slate-800 ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                        <div className="h-20 flex items-center justify-between px-6 gap-3 border-b border-slate-800/60 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg transform rotate-2">
+                                    <i className="fas fa-chart-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <span className="text-white font-black text-2xl tracking-tighter block leading-none">Mentra ERP  <span className="text-blue-500">Lite</span></span>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden w-8 h-8 flex items-center justify-center bg-slate-800 rounded-lg text-slate-300 hover:text-white transition-colors">
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto hide-scrollbar">
+                            {allowedMenus.map(([id, cfg], index) => {
+                                const showCategory = cfg.category && (index === 0 || allowedMenus[index - 1][1].category !== cfg.category);
+                                return (
+                                    <React.Fragment key={id}>
+                                        {showCategory && (
+                                            <p className="text-[10px] font-black text-slate-500 px-3 mt-5 mb-2 uppercase tracking-widest border-r-2 border-blue-500/50 mr-1">
+                                                {cfg.category}
+                                            </p>
+                                        )}
+                                        <button 
+                                            onClick={() => { setActiveModule(id); setIsSidebarOpen(false); }} 
+                                            className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-200 ${activeModule === id ? 'nav-active bg-white/5' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
+                                        >
+                                            <i className={`fas ${cfg.icon} w-5 text-center text-lg`}></i>
+                                            <span className="text-sm font-bold">{cfg.title}</span>
+                                        </button>
+                                    </React.Fragment>
+                                );
+                            })}
+                        </nav>
+                        
+                        <div className="p-5 bg-slate-900/50 border-t border-slate-800/60 shrink-0 pb-safe">
+                            <div className="flex items-center gap-3 mb-4 px-1">
+                                <div className="relative">
+                                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold border border-slate-600 shadow-inner">
+                                        {session.name.charAt(0)}
+                                    </div>
+                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0b1120] rounded-full"></div>
+                                </div>
+                                <div className="overflow-hidden flex-1">
+                                    <p className="text-sm font-black text-white truncate">{session.name}</p>
+                                    <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-0.5">{Role_Names[session.role]}</p>
+                                </div>
+                            </div>
+                            <button onClick={handleLogout} className="w-full py-3 text-rose-400 bg-rose-500/10 rounded-xl font-bold text-sm hover:bg-rose-500 hover:text-white transition-all">
+                                <i className="fas fa-power-off ml-2"></i> إنهاء الجلسة
+                            </button>
+                        </div>
+                    </aside>
+
+                    {/* منطقة المحتوى الرئيسية */}
+                    <main className="flex-1 flex flex-col min-w-0">
+                        
+                        {/* الهيدر العلوي */}
+                        <header className="h-16 md:h-20 glass-header flex items-center justify-between px-4 md:px-8 z-40 sticky top-0">
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => setIsSidebarOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-slate-700 rounded-xl bg-white border border-slate-200 shadow-sm active:scale-95 transition-transform">
+                                    <i className="fas fa-bars text-lg"></i>
+                                </button>
+                                <div>
+                                    <h2 className="font-black text-slate-800 text-lg md:text-2xl leading-none">{Menu_Matrix[activeModule]?.title}</h2>
+                                    <p className="text-[9px] md:text-xs text-slate-500 font-bold mt-1 hidden sm:block">Mentra ERP System - إحصائيات وإدارة</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <div className="hidden sm:flex flex-col items-end">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">المساحة المحلية</span>
+                                    <span className="text-[10px] font-bold text-blue-600">{storageUsed}</span>
+                                </div>
+                                <div className="h-8 w-[1px] bg-slate-200 hidden sm:block mx-1"></div>
+                                <div className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-600 bg-white px-3 md:px-4 py-2 rounded-full shadow-sm border border-slate-200">
+                                    <i className="far fa-calendar-alt text-blue-500 hidden sm:inline-block"></i>
+                                    <span>{systemDate}</span>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* الحاوية الديناميكية لمحتوى الشاشات */}
+                        <div className="flex-1 overflow-y-auto p-3 md:p-8 pb-24 md:pb-8 relative">
+                            <div className="max-w-7xl mx-auto h-full">
+                                {isModuleLoading || !dbReady ? (
+                                    <div className="flex flex-col items-center justify-center h-64 text-slate-400 animate-view">
+                                        <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                                        <p className="font-bold text-sm tracking-wide">جاري جلب البيانات...</p>
+                                    </div>
+                                ) : ActiveComponent ? (
+                                    /* حقن مكون React الخاص بالشاشة هنا وتمرير الخواص له */
+                                    <ActiveComponent 
+                                        session={session} 
+                                        showToast={showToast} 
+                                        setActiveModule={setActiveModule} 
+                                    />
+                                ) : (
+                                    <div className="p-10 text-center bg-white rounded-3xl border border-slate-100 shadow-sm mt-10 animate-view">
+                                        <i className="fas fa-tools text-5xl text-blue-300 mb-4"></i>
+                                        <h3 className="text-xl font-bold text-slate-800">جاري تطوير هذا القسم</h3>
+                                        <p className="text-slate-400 mt-2 text-sm font-bold">ملف <code className="text-rose-500 bg-rose-50 px-2 py-0.5 rounded mx-1">pages/{activeModule}.js</code> غير موجود أو لم يتم تصدير الـ Component بداخله.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* الشريط السفلي الذكي للموبايل (Mobile Bottom Bar) */}
+                        <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 flex items-center justify-around z-50 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                            <button onClick={() => setActiveModule('main')} className={`flex flex-col items-center gap-1 w-16 transition-colors ${activeModule === 'main' ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>
+                                <i className="fas fa-chart-pie text-xl"></i><span className="text-[10px] font-bold mt-0.5">الرئيسية</span>
+                            </button>
+                            
+                            {/* الزر الرئيسي الأوسط (نقطة البيع الكاشير) - بتصميم بارز */}
+                            <button onClick={() => setActiveModule('sales')} className="flex flex-col items-center gap-1 w-16 relative">
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center -mt-9 shadow-xl border-4 border-slate-50 transition-all ${activeModule === 'sales' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white scale-105' : 'bg-[#0b1120] text-white hover:scale-105'}`}>
+                                    <i className="fas fa-cash-register text-2xl"></i>
+                                </div>
+                                <span className={`text-[10px] font-bold mt-1 ${activeModule === 'sales' ? 'text-blue-600' : 'text-slate-500'}`}>الكاشير</span>
+                            </button>
+                            
+                            <button onClick={() => setActiveModule('inventory')} className={`flex flex-col items-center gap-1 w-16 transition-colors ${activeModule === 'inventory' ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>
+                                <i className="fas fa-boxes-stacked text-xl"></i><span className="text-[10px] font-bold mt-0.5">المخازن</span>
+                            </button>
+                        </div>
+                    </main>
+                </div>
+            );
         }
 
-        document.addEventListener('DOMContentLoaded', initUI);
+        // تشغيل تطبيق الـ React وربطه بـ DOM
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ErrorBoundary><DashboardApp /></ErrorBoundary>);
     </script>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js');
-            
-            // هذا السطر يراقب إذا تم تحميل Service Worker جديد وتفعيله
-            // وبمجرد تفعيله يقوم بعمل ريفريش للصفحة ليعرض التعديلات الجديدة فوراً للعميل
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    window.location.reload();
-                    refreshing = true;
-                }
+
+    <!-- تسجيل وتحديث الـ Service Worker ليعمل أوفلاين -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js');
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        window.location.reload();
+                        refreshing = true;
+                    }
+                });
             });
-        });
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
