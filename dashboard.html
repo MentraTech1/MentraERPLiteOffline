@@ -165,7 +165,7 @@
             'purchases':        { roles: ['admin', 'manager'], title: 'فاتورة مشتريات', icon: 'fa-shopping-cart', componentName: 'Module_Purchases', category: null },
             'purchases_report': { roles: ['admin', 'manager'], title: 'سجل المشتريات', icon: 'fa-history', componentName: 'Module_PurchasesReport', category: null },
             
-            'inventory':        { roles: ['admin', 'manager'], title: 'المخازن والجرد', icon: 'fa-boxes-stacked', componentName: 'Module_Inventory', category: 'المالية والمخازن' },
+            'Inventory':        { roles: ['admin', 'manager'], title: 'المخازن والجرد', icon: 'fa-boxes-stacked', componentName: 'Module_Inventory', category: 'المالية والمخازن' },
             'accounts':         { roles: ['admin'], title: 'دليل الحسابات', icon: 'fa-users-cog', componentName: 'Module_Accounts', category: null },
             'journal':          { roles: ['admin'], title: 'القيود اليومية والمصروفات', icon: 'fa-book', componentName: 'Module_Journal', category: null },
             'profit_report':    { roles: ['admin', 'manager'], title: 'تقرير الأرباح', icon: 'fa-chart-line', componentName: 'Module_ProfitReport', category: null },
@@ -436,7 +436,7 @@
                                 <span className={`text-[10px] font-bold mt-1 ${activeModule === 'sales' ? 'text-blue-600' : 'text-slate-500'}`}>الكاشير</span>
                             </button>
                             
-                            <button onClick={() => setActiveModule('inventory')} className={`flex flex-col items-center gap-1 w-16 transition-colors ${activeModule === 'inventory' ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>
+                            <button onClick={() => setActiveModule('Inventory')} className={`flex flex-col items-center gap-1 w-16 transition-colors ${activeModule === 'inventory' ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>
                                 <i className="fas fa-boxes-stacked text-xl"></i><span className="text-[10px] font-bold mt-0.5">المخازن</span>
                             </button>
                         </div>

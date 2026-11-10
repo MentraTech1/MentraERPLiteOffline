@@ -147,17 +147,57 @@ window.Module_Settings_Container = function({ session, showToast }) {
         }
     };
 
-    // إعادة ضبط المصنع باستخدام مفتاح الأمان
+    // =========================================================
+    // التعديل هنا: استخدام SweetAlert بدلاً من window.prompt
+    // =========================================================
     const handleFactoryReset = async () => {
         if (!formData.security_key) {
-            return window.Swal.fire('تنبيه', 'يجب إنشاء وحفظ مفتاح أمان أولاً لتتمكن من استخدام هذه الخاصية.', 'warning');
+            return window.Swal.fire({
+                icon: 'warning',
+                title: 'تنبيه',
+                text: 'يجب إنشاء وحفظ مفتاح أمان أولاً لتتمكن من استخدام هذه الخاصية.',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2 bg-blue-600' }
+            });
         }
 
-        const userInput = window.prompt("عملية خطيرة! لحماية بياناتك، يرجى إدخال (مفتاح الأمان) الخاص بك لتأكيد الحذف النهائي:");
-        if (userInput !== formData.security_key) {
-            return window.Swal.fire('مرفوض', 'مفتاح الأمان غير صحيح!', 'error');
+        // استخدام SweetAlert كبديل لـ prompt (يعمل بامتياز في Electron)
+        const { value: userInput } = await window.Swal.fire({
+            title: 'تأكيد الحذف النهائي',
+            text: 'عملية خطيرة! لحماية بياناتك، يرجى إدخال (مفتاح الأمان) الخاص بك لتأكيد الحذف:',
+            input: 'text',
+            inputPlaceholder: 'أدخل مفتاح الأمان هنا...',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'تأكيد',
+            cancelButtonText: 'إلغاء',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            customClass: {
+                popup: 'rounded-3xl',
+                confirmButton: 'rounded-xl font-bold px-6 py-2',
+                cancelButton: 'rounded-xl font-bold px-6 py-2'
+            },
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'يجب إدخال مفتاح الأمان!';
+                }
+            }
+        });
+
+        // إذا ضغط المستخدم على "إلغاء" أو أغلق النافذة
+        if (!userInput) return;
+
+        // التحقق من صحة المفتاح
+        if (userInput.toUpperCase() !== formData.security_key.toUpperCase()) {
+            return window.Swal.fire({
+                icon: 'error',
+                title: 'مرفوض',
+                text: 'مفتاح الأمان غير صحيح!',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2 bg-red-600' }
+            });
         }
 
+        // تنفيذ الحذف إذا كان المفتاح صحيحاً
         try {
             const db = getDB();
             await db.delete();
@@ -167,14 +207,26 @@ window.Module_Settings_Container = function({ session, showToast }) {
             shops = shops.filter(s => s.dbName !== currentDBName);
             localStorage.setItem('mentra_shops_list', JSON.stringify(shops));
             
-            window.Swal.fire('نجاح', 'تم ضبط المصنع. سيتم تسجيل الخروج...', 'success');
+            window.Swal.fire({
+                icon: 'success',
+                title: 'نجاح',
+                text: 'تم ضبط المصنع. سيتم تسجيل الخروج...',
+                showConfirmButton: false,
+                timer: 1500,
+                customClass: { popup: 'rounded-3xl' }
+            });
             
             setTimeout(() => {
                 localStorage.clear();
                 window.location.replace('index.html');
             }, 1500);
         } catch (err) {
-            window.Swal.fire('خطأ', 'فشل عملية المسح', 'error');
+            window.Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text: 'فشل عملية المسح',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2' }
+            });
         }
     };
 

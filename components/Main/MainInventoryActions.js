@@ -18,7 +18,7 @@ window.MainInventoryActions = function({ stats, navigateToModule }) {
                             <div className="text-lg md:text-xl font-black text-blue-300 font-mono">{stats.productsCount}</div>
                             <div className="text-[9px] md:text-[10px] font-bold text-slate-400 mt-1">منتج مسجل</div>
                         </div>
-                        <div onClick={() => navigateToModule('inventory')} className={`border p-2 md:p-3 rounded-xl md:rounded-2xl text-center cursor-pointer hover:scale-105 transition-all duration-300 shadow-md backdrop-blur-sm ${stats.lowStockCount > 0 ? 'bg-rose-500/20 border-rose-500/30 hover:bg-rose-500/40 animate-pulse' : 'bg-emerald-500/20 border-emerald-500/30'}`}>
+                        <div onClick={() => navigateToModule('Inventory')} className={`border p-2 md:p-3 rounded-xl md:rounded-2xl text-center cursor-pointer hover:scale-105 transition-all duration-300 shadow-md backdrop-blur-sm ${stats.lowStockCount > 0 ? 'bg-rose-500/20 border-rose-500/30 hover:bg-rose-500/40 animate-pulse' : 'bg-emerald-500/20 border-emerald-500/30'}`}>
                             <div className={`text-lg md:text-xl font-black font-mono ${stats.lowStockCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>{stats.lowStockCount}</div>
                             <div className={`text-[9px] md:text-[10px] font-bold mt-1 ${stats.lowStockCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}><i className="fas fa-external-link-alt ml-1"></i> نواقص (للجرد)</div>
                         </div>
