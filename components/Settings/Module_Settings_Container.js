@@ -2,11 +2,9 @@
 window.Module_Settings_Container = function({ session, showToast }) {
     const { useState, useEffect, useRef } = React;
 
-    // حالة التحميل والتبويب النشط
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'import' | 'backup'
+    const [activeTab, setActiveTab] = useState('profile'); 
     
-    // حالات البيانات
     const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef(null);
     const [isKeyVisible, setIsKeyVisible] = useState(false);
@@ -16,7 +14,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         shop_name: '', phone: '', email: '', address: '', security_key: ''
     });
 
-    // دالة الاتصال بقاعدة البيانات
     const getDB = () => {
         const dbName = localStorage.getItem('mentra_current_db') || 'MentraLocalCache';
         const db = new window.Dexie(dbName);
@@ -31,7 +28,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         return db;
     };
 
-    // جلب البيانات عند فتح الصفحة
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -70,7 +66,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    // توليد مفتاح أمان جديد
     const generateSecurityKey = () => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let newKey = '';
@@ -82,7 +77,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         setIsKeyVisible(true);
     };
 
-    // حفظ البيانات (بيانات الحساب)
     const handleSave = async () => {
         if (formData.password && formData.password !== formData.confirmPassword) {
             return window.Swal.fire('خطأ', 'كلمتا المرور غير متطابقتين!', 'error');
@@ -94,12 +88,10 @@ window.Module_Settings_Container = function({ session, showToast }) {
             await db.open();
             const activeSession = await db.active_session.toCollection().first();
             
-            // تحديث المستخدم
             const userUpdate = { full_name: formData.full_name, username: formData.username, phone: formData.phone, security_key: formData.security_key };
             if (formData.password) userUpdate.password = formData.password;
             await db.local_users.update(activeSession.user_id, userUpdate);
 
-            // تحديث الإعدادات
             const settings = await db.settings.toCollection().first();
             await db.settings.update(settings.id, {
                 shop_name: formData.shop_name,
@@ -117,7 +109,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         }
     };
 
-    // تصدير JSON
     const handleExport = async (type) => {
         try {
             const db = getDB();
@@ -147,61 +138,24 @@ window.Module_Settings_Container = function({ session, showToast }) {
         }
     };
 
-    // =========================================================
-    // التعديل هنا: استخدام SweetAlert بدلاً من window.prompt
-    // =========================================================
-    const handleFactoryReset = async () => {
-        if (!formData.security_key) {
-            return window.Swal.fire({
-                icon: 'warning',
-                title: 'تنبيه',
-                text: 'يجب إنشاء وحفظ مفتاح أمان أولاً لتتمكن من استخدام هذه الخاصية.',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2 bg-blue-600' }
-            });
-        }
-
-        // استخدام SweetAlert كبديل لـ prompt (يعمل بامتياز في Electron)
-        const { value: userInput } = await window.Swal.fire({
-            title: 'تأكيد الحذف النهائي',
-            text: 'عملية خطيرة! لحماية بياناتك، يرجى إدخال (مفتاح الأمان) الخاص بك لتأكيد الحذف:',
-            input: 'text',
-            inputPlaceholder: 'أدخل مفتاح الأمان هنا...',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'تأكيد',
-            cancelButtonText: 'إلغاء',
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#64748b',
-            customClass: {
-                popup: 'rounded-3xl',
-                confirmButton: 'rounded-xl font-bold px-6 py-2',
-                cancelButton: 'rounded-xl font-bold px-6 py-2'
-            },
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'يجب إدخال مفتاح الأمان!';
-                }
-            }
-        });
-
-        // إذا ضغط المستخدم على "إلغاء" أو أغلق النافذة
-        if (!userInput) return;
-
-        // التحقق من صحة المفتاح
-        if (userInput.toUpperCase() !== formData.security_key.toUpperCase()) {
+    // تنفيذ الحذف الفعلي بعد استلام المفتاح من النافذة
+    const handleFactoryReset = async (enteredKey) => {
+        // مقارنة المفتاح (غير حساس لحالة الأحرف)
+        if (enteredKey.toUpperCase() !== formData.security_key.toUpperCase()) {
             return window.Swal.fire({
                 icon: 'error',
-                title: 'مرفوض',
-                text: 'مفتاح الأمان غير صحيح!',
+                title: 'مفتاح خاطئ',
+                text: 'مفتاح الأمان الذي أدخلته غير صحيح. يرجى التأكد والمحاولة مرة أخرى.',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2 bg-red-600' }
             });
         }
 
-        // تنفيذ الحذف إذا كان المفتاح صحيحاً
+        // إذا كان المفتاح صحيحاً، قم بالحذف
         try {
             const db = getDB();
-            await db.delete();
+            await db.delete(); // مسح قاعدة البيانات الحالية
             
+            // إزالة المحل من قائمة المحلات في الـ LocalStorage
             const currentDBName = localStorage.getItem('mentra_current_db');
             let shops = JSON.parse(localStorage.getItem('mentra_shops_list') || '[]');
             shops = shops.filter(s => s.dbName !== currentDBName);
@@ -209,22 +163,24 @@ window.Module_Settings_Container = function({ session, showToast }) {
             
             window.Swal.fire({
                 icon: 'success',
-                title: 'نجاح',
-                text: 'تم ضبط المصنع. سيتم تسجيل الخروج...',
+                title: 'تم الحذف بنجاح',
+                text: 'تم ضبط المصنع. سيتم تسجيل الخروج الآن...',
                 showConfirmButton: false,
                 timer: 1500,
-                customClass: { popup: 'rounded-3xl' }
+                customClass: { popup: 'rounded-[2rem]' }
             });
             
+            // تسجيل الخروج والعودة للصفحة الرئيسية
             setTimeout(() => {
                 localStorage.clear();
                 window.location.replace('index.html');
             }, 1500);
         } catch (err) {
+            console.error(err);
             window.Swal.fire({
                 icon: 'error',
-                title: 'خطأ',
-                text: 'فشل عملية المسح',
+                title: 'خطأ داخلي',
+                text: 'حدث خطأ أثناء محاولة مسح البيانات.',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2' }
             });
         }
@@ -236,7 +192,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
         <div className="space-y-6 md:space-y-8 animate-view pb-24 max-w-7xl mx-auto" dir="rtl">
             <window.SettingsHeader />
             
-            {/* شريط التبويبات (Tabs Navigation) */}
             <div className="flex overflow-x-auto hide-scrollbar gap-2 p-1.5 bg-slate-200/50 rounded-2xl w-full md:w-fit mx-auto md:mx-0 snap-x">
                 <button 
                     onClick={() => setActiveTab('profile')} 
@@ -258,7 +213,6 @@ window.Module_Settings_Container = function({ session, showToast }) {
                 </button>
             </div>
 
-            {/* محتوى التبويبات (ديناميكي) */}
             <div className="mt-4">
                 {activeTab === 'profile' && (
                     <window.SettingsProfileForm 
@@ -281,7 +235,8 @@ window.Module_Settings_Container = function({ session, showToast }) {
                         onExport={handleExport} 
                         onTriggerImport={() => fileInputRef.current.click()} 
                         fileInputRef={fileInputRef} 
-                        onFactoryReset={handleFactoryReset} 
+                        onFactoryReset={handleFactoryReset}
+                        hasSecurityKey={!!formData.security_key}
                     />
                 )}
             </div>
